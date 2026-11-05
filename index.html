@@ -101,11 +101,11 @@
         .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: #f28b82; }
         .ec-status[data-state="ok"] { color: #6fd3a4; }
 
-        /* ================= YANGILIKLAR RO'YXATI (1/5 VA 4/5) ================= */
+        /* ================= YANGILIKLAR RO'YXATI ================= */
         .ec-events-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 16px; /* Oraliq kattalashtirildi */
             width: 100%;
         }
 
@@ -114,6 +114,32 @@
             align-items: flex-start;
             gap: 8px;
             width: 100%;
+            transition: opacity 0.3s;
+        }
+
+        /* O'tib ketgan yangiliklar uchun xiralik */
+        .ec-event-row.is-past {
+            opacity: 0.5; /* Xira ko'rinish */
+        }
+
+        /* Ajratuvchi chiziq (hozirgi vaqt chegarasi) */
+        .ec-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 4px 0;
+            color: var(--ec-accent);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .ec-divider::before,
+        .ec-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--ec-border);
         }
 
         /* Vaqt qismi (Chap tomonda, 1/5 qism) */
@@ -278,7 +304,7 @@
             .ec-filter-btn svg { width: 18px; height: 18px; }
             .ec-meta { font-size: 12px; margin: 0 2px 10px; }
             .ec-status { font-size: 12px; min-height: 16px; margin-bottom: 12px; }
-            .ec-events-list { gap: 12px; }
+            .ec-events-list { gap: 20px; }
             .ec-event-row { gap: 12px; }
             .ec-event-time-col { font-size: 15px; padding-top: 16px; }
             .ec-event-card { padding: 14px 16px; border-radius: 12px; gap: 10px; }
@@ -307,7 +333,6 @@
 
         <section class="ec-toolbar" aria-label="Sana va filtrlar">
             <div class="ec-range-tabs">
-                <!-- Kecha olib tashlandi -->
                 <button type="button" data-range="today">Bugun</button>
                 <button type="button" data-range="tomorrow">Ertaga</button>
                 <button type="button" data-range="7days" class="is-active">Keyingi 7 kun</button>
@@ -444,7 +469,6 @@
         function getRangeBounds(range) {
             const today = getTashkentDateKey();
             switch (range) {
-                // "yesterday" holati olib tashlandi
                 case "today": return [today, today];
                 case "tomorrow": return [shiftDateKey(today, 1), shiftDateKey(today, 1)];
                 default: return [today, shiftDateKey(today, 7)];
@@ -492,14 +516,28 @@
                 ? `Oxiri: ${new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, dateStyle: "short", timeStyle: "short" }).format(state.lastUpdated)} (Toshkent)`
                 : "Hali yangilanmagan";
 
-            // "yesterday" holati olib tashlandi
-
             if (!events.length) {
                 elements.list.innerHTML = `<div class="ec-empty"><strong>Yangilik topilmadi</strong><span>Tanlangan filtrlarga mos ma'lumot yo'q.</span></div>`;
                 return;
             }
 
-            elements.list.innerHTML = events.map(event => {
+            const now = Date.now();
+            let dividerInserted = false;
+            let htmlContent = "";
+
+            events.forEach(event => {
+                const eventTime = event.time instanceof Date ? event.time.getTime() : 0;
+                const isPast = eventTime < now;
+
+                // Agar yangilik o'tib ketgan bo'lmasa va hali chiziq qo'yilmagan bo'lsa, chiziq qo'shamiz
+                if (!isPast && !dividerInserted) {
+                    htmlContent += `
+                    <div class="ec-divider">
+                        <span>Hozirgi vaqt</span>
+                    </div>`;
+                    dividerInserted = true;
+                }
+
                 const currData = CURRENCIES.find(c => c.code === event.currency);
                 const flagHtml = currData && currData.flag 
                     ? `<img src="https://flagcdn.com/w20/${currData.flag}.png" class="ec-flag" alt="${event.currency}">` 
@@ -511,8 +549,8 @@
 
                 const borderClass = `ec-card-${event.impact}`;
 
-                return `
-                <div class="ec-event-row">
+                htmlContent += `
+                <div class="ec-event-row ${isPast ? 'is-past' : ''}">
                     <div class="ec-event-time-col">${formatTime(event.time)}</div>
                     
                     <div class="ec-event-card ${borderClass}">
@@ -541,7 +579,9 @@
                         </div>
                     </div>
                 </div>`;
-            }).join("");
+            });
+
+            elements.list.innerHTML = htmlContent;
         }
 
         async function fetchEvents() {
