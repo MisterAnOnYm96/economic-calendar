@@ -17,6 +17,8 @@
             --ec-text: #e8eef7;
             --ec-muted: #91a0b6;
             --ec-accent: #60a5fa;
+            --ec-green: #35b779;
+            --ec-red: #f05252;
         }
 
         body {
@@ -41,175 +43,118 @@
             gap: 16px;
         }
 
-        .ec-title-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .ec-header h1 {
-            margin: 0;
-            font-size: clamp(25px, 4vw, 34px);
-        }
-
-        .ec-subtitle, .ec-footer {
-            color: var(--ec-muted);
-            font-size: 13px;
-            margin: 0;
-        }
+        .ec-title-wrap { display: flex; flex-direction: column; gap: 5px; }
+        .ec-header h1 { margin: 0; font-size: clamp(25px, 4vw, 34px); }
+        .ec-subtitle, .ec-footer { color: var(--ec-muted); font-size: 13px; margin: 0; }
 
         .ec-refresh {
             border: 1px solid var(--ec-border);
             border-radius: 12px;
             background: var(--ec-panel-2);
             color: var(--ec-text);
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex-shrink: 0;
+            width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
         }
-
         .ec-refresh:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
         .ec-refresh:disabled { opacity: .6; cursor: wait; }
 
-        /* Kunlar va Filtr tugmasi bir qatorda turishi uchun tuzatildi */
         .ec-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: nowrap; /* Pastga tushishni oldini oladi */
-            gap: 10px;
-            background: var(--ec-panel);
-            border: 1px solid var(--ec-border);
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: nowrap; gap: 10px;
+            background: var(--ec-panel); border: 1px solid var(--ec-border);
+            border-radius: 14px; padding: 12px; margin-bottom: 16px;
         }
 
-        .ec-range-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 7px;
-        }
+        .ec-range-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
 
         .ec-range-tabs button {
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 9px 12px;
-            background: transparent;
-            color: var(--ec-muted);
-            cursor: pointer;
-            font-size: 13px;
-            white-space: nowrap; /* Matn buzilib tushmasligi uchun */
+            border: 1px solid transparent; border-radius: 8px;
+            padding: 9px 12px; background: transparent;
+            color: var(--ec-muted); cursor: pointer; font-size: 13px; white-space: nowrap;
         }
 
-        .ec-range-tabs button.is-active {
-            background: #1d3b60;
-            border-color: #315d8c;
-            color: #fff;
-        }
+        .ec-range-tabs button.is-active { background: #1d3b60; border-color: #315d8c; color: #fff; }
 
-        /* Filtr tugmasi ixcham va o'ngga mahkamlangan */
         .ec-filter-btn {
-            border: 1px solid var(--ec-border);
-            border-radius: 8px;
-            background: var(--ec-panel-2);
-            color: var(--ec-text);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            flex-shrink: 0; /* Siqilib qolmasligi uchun */
+            border: 1px solid var(--ec-border); border-radius: 8px;
+            background: var(--ec-panel-2); color: var(--ec-text);
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
         }
-
         .ec-filter-btn:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
 
         .ec-meta {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: var(--ec-muted);
-            font-size: 12px;
-            margin: 0 2px 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            color: var(--ec-muted); font-size: 12px; margin: 0 2px 10px;
         }
 
         .ec-status {
-            margin-bottom: 12px;
-            color: var(--ec-muted);
-            font-size: 12px;
-            min-height: 16px;
+            margin-bottom: 12px; color: var(--ec-muted); font-size: 12px; min-height: 16px;
         }
-
-        .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: #f28b82; }
-        .ec-status[data-state="ok"] { color: #6fd3a4; }
+        .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: var(--ec-red); }
+        .ec-status[data-state="ok"] { color: var(--ec-green); }
 
         .ec-table-wrap {
-            overflow: hidden;
-            border: 1px solid var(--ec-border);
-            border-radius: 14px;
-            background: var(--ec-panel);
+            overflow: hidden; border: 1px solid var(--ec-border);
+            border-radius: 14px; background: var(--ec-panel);
         }
 
+        /* Jadval tuzilishi: Vaqt ustuni kengroq qilindi */
         .ec-table-head, .ec-event {
             display: grid;
-            grid-template-columns: 76px minmax(190px, 1.8fr) repeat(3, minmax(85px, .7fr));
-            gap: 14px;
-            align-items: center;
+            grid-template-columns: 90px minmax(180px, 1.5fr) repeat(3, minmax(80px, .7fr));
+            gap: 14px; align-items: center;
         }
 
         .ec-table-head {
-            padding: 13px 16px;
-            background: var(--ec-panel-2);
-            color: var(--ec-muted);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .05em;
+            padding: 13px 16px; background: var(--ec-panel-2);
+            color: var(--ec-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
         }
 
         .ec-event {
-            padding: 15px 16px;
-            border-top: 1px solid var(--ec-border);
+            padding: 15px 16px; border-top: 1px solid var(--ec-border);
+        }
+
+        /* Vaqt va Taymer ustuni */
+        .ec-time-col {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .ec-event-time {
             font-variant-numeric: tabular-nums;
-            color: var(--ec-muted);
-            font-size: 13px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ec-text);
         }
 
-        .ec-event-heading {
+        .ec-event-timer {
+            font-size: 11px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 5px;
+            gap: 4px;
+        }
+
+        .ec-event-timer.past { color: var(--ec-red); }
+        .ec-event-timer.future { color: var(--ec-green); }
+
+        .ec-event-heading {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 5px;
         }
 
         .ec-flag {
-            width: 18px;
-            height: 13px;
-            border-radius: 2px;
-            object-fit: cover;
-            border: 1px solid rgba(255,255,255,0.1);
+            width: 18px; height: 13px; border-radius: 2px;
+            object-fit: cover; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .ec-currency {
-            color: var(--ec-accent);
-            font-weight: 700;
-            font-size: 12px;
-        }
+        .ec-currency { color: var(--ec-accent); font-weight: 700; font-size: 12px; }
 
         .ec-impact {
-            border-radius: 5px;
-            padding: 3px 5px;
-            font-size: 9px;
-            font-weight: 800;
+            border-radius: 5px; padding: 3px 5px; font-size: 9px; font-weight: 800;
         }
 
         .ec-impact-high { color: #ff8d8d; background: #4b252e; }
@@ -217,215 +162,108 @@
         .ec-impact-low { color: #65d6a0; background: #173e32; }
         .ec-impact-unknown { color: var(--ec-muted); background: var(--ec-panel-2); }
 
-        .ec-event-title {
-            font-size: 13px;
-            font-weight: 600;
-            line-height: 1.4;
-        }
-
-        .ec-event-country, .ec-value-label {
-            color: var(--ec-muted);
-            font-size: 10px;
-            margin-top: 4px;
-        }
+        .ec-event-title { font-size: 13px; font-weight: 600; line-height: 1.4; }
+        .ec-event-country, .ec-value-label { color: var(--ec-muted); font-size: 10px; margin-top: 4px; }
 
         .ec-event-value {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 12px;
-            overflow-wrap: anywhere;
+            display: flex; flex-direction: column; gap: 4px;
+            font-size: 12px; overflow-wrap: anywhere;
         }
 
-        .ec-event-value strong {
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-        }
+        .ec-event-value strong { font-weight: 600; font-variant-numeric: tabular-nums; }
 
         .ec-empty {
-            display: flex;
-            min-height: 180px;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: var(--ec-muted);
-            text-align: center;
-            padding: 24px;
+            display: flex; min-height: 180px; flex-direction: column;
+            align-items: center; justify-content: center; gap: 8px;
+            color: var(--ec-muted); text-align: center; padding: 24px;
         }
-
         .ec-empty strong { color: var(--ec-text); }
         .ec-empty span { font-size: 12px; }
 
-        .ec-footer {
-            padding: 18px 2px;
-            text-align: center;
-        }
+        .ec-footer { padding: 18px 2px; text-align: center; }
 
         /* ================= MODAL ================= */
         .ec-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(2px);
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px);
+            z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
         }
-
         .ec-modal-overlay.is-open { opacity: 1; visibility: visible; }
 
         .ec-modal {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: var(--ec-panel);
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            padding: 20px;
-            z-index: 1001;
-            transform: translateY(100%);
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--ec-panel); border-top-left-radius: 20px; border-top-right-radius: 20px;
+            padding: 20px; z-index: 1001; transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 50vh;
-            overflow-y: auto;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            max-height: 50vh; overflow-y: auto; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
         }
-
         .ec-modal-overlay.is-open .ec-modal { transform: translateY(0); }
 
         .ec-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--ec-border);
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--ec-border);
         }
-
         .ec-modal-header h2 { margin: 0; font-size: 18px; }
+        .ec-modal-close { background: transparent; border: none; color: var(--ec-muted); font-size: 24px; cursor: pointer; padding: 0; }
 
-        .ec-modal-close {
-            background: transparent;
-            border: none;
-            color: var(--ec-muted);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .ec-impact-filter {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
+        .ec-impact-filter { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
         .ec-impact-filter label {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: var(--ec-panel-2);
-            padding: 12px;
-            border-radius: 10px;
-            color: var(--ec-muted);
-            font-size: 13px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.2s;
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            gap: 8px; background: var(--ec-panel-2); padding: 12px;
+            border-radius: 10px; color: var(--ec-muted); font-size: 13px;
+            cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
         }
-        
-        .ec-impact-filter label:has(input:checked) {
-            border-color: var(--ec-border);
-            color: var(--ec-text);
-        }
-
+        .ec-impact-filter label:has(input:checked) { border-color: var(--ec-border); color: var(--ec-text); }
         .ec-impact-filter input { display: none; }
 
-        .dot {
-            width: 8px;
-            height: 8px;
-            display: inline-block;
-            border-radius: 50%;
-        }
-        .dot.high { background: #f05252; }
+        .dot { width: 8px; height: 8px; display: inline-block; border-radius: 50%; }
+        .dot.high { background: var(--ec-red); }
         .dot.medium { background: #e9a23b; }
-        .dot.low { background: #35b779; }
+        .dot.low { background: var(--ec-green); }
 
-        /* ================= VALYUTALAR (Aynan 3 QATORGA MOSLASHTIRILDI) ================= */
         .ec-currency-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 ta ustun */
-            gap: 10px; /* Kartochkalar orasidagi masofa */
-            padding-bottom: 20px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-bottom: 20px;
         }
 
         .ec-currency-item {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: var(--ec-panel-2);
-            padding: 14px 10px; /* Kattaroq qilindi */
-            border-radius: 10px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; background: var(--ec-panel-2); padding: 14px 10px;
+            border-radius: 10px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
         }
-
-        .ec-currency-item:hover, .ec-currency-item.is-active {
-            border-color: var(--ec-accent);
-            background: #1d3b60;
-        }
-
-        .ec-currency-item img {
-            width: 28px; /* Bayroq kattalashtirildi */
-            height: 20px;
-            border-radius: 3px;
-            object-fit: cover;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .ec-currency-item span {
-            font-weight: 700;
-            font-size: 14px; /* Matn kattalashtirildi */
-        }
+        .ec-currency-item:hover, .ec-currency-item.is-active { border-color: var(--ec-accent); background: #1d3b60; }
+        .ec-currency-item img { width: 28px; height: 20px; border-radius: 3px; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .ec-currency-item span { font-weight: 700; font-size: 14px; }
 
         /* Mobil moslashuv */
         @media (max-width: 700px) {
             .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
             .ec-table-head { display: none; }
             .ec-event {
-                grid-template-columns: 1fr;
-                gap: 8px;
+                grid-template-columns: 70px 1fr;
+                gap: 12px;
                 padding: 13px 11px;
-                position: relative;
+                align-items: flex-start;
             }
-            .ec-event-time {
-                position: absolute;
-                top: 13px;
-                right: 11px;
-                font-size: 12px;
-                color: var(--ec-accent);
+            
+            .ec-time-col {
+                grid-row: 1 / 3;
+                padding-top: 2px;
             }
-            .ec-event-main { padding-right: 50px; }
+
+            .ec-event-main { grid-column: 2; }
+            
+            /* Actual/Forecast larni pastga, 2-ustunga joylash */
             .ec-event-value {
-                display: inline-flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 5px;
-                background: var(--ec-panel-2);
-                padding: 4px 8px;
-                border-radius: 6px;
-                margin-top: 4px;
-                margin-right: 5px;
+                grid-column: 2;
+                display: inline-flex; flex-direction: row; align-items: center;
+                gap: 5px; background: var(--ec-panel-2); padding: 4px 8px;
+                border-radius: 6px; margin-right: 5px; margin-bottom: 4px; font-size: 11px;
             }
+            
             .ec-event-value .ec-value-label { margin-top: 0; font-size: 9px; }
             .ec-event-value strong { font-size: 11px; }
             .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
             
-            /* Mobil telefonda ham kunlar va filtr yonma-yon turishi uchun */
             .ec-toolbar { padding: 8px; gap: 8px; }
             .ec-range-tabs button { padding: 8px; font-size: 12px; }
         }
@@ -485,16 +323,12 @@
                 <h2>Filtrlash</h2>
                 <button class="ec-modal-close" id="ec-close-filter">&times;</button>
             </div>
-            
             <div class="ec-impact-filter" aria-label="Impact filtri">
                 <label><input type="checkbox" data-impact value="high" checked><i class="dot high"></i> High</label>
                 <label><input type="checkbox" data-impact value="medium" checked><i class="dot medium"></i> Medium</label>
                 <label><input type="checkbox" data-impact value="low" checked><i class="dot low"></i> Low</label>
             </div>
-
-            <div class="ec-currency-list" id="ec-currency-list">
-                <!-- JS orqali to'ldiriladi -->
-            </div>
+            <div class="ec-currency-list" id="ec-currency-list"></div>
         </div>
     </div>
 
@@ -505,42 +339,23 @@
         const TIME_ZONE = "Asia/Tashkent";
 
         const CURRENCIES = [
-            { code: "USD", flag: "us" },
-            { code: "EUR", flag: "eu" },
-            { code: "GBP", flag: "gb" },
-            { code: "JPY", flag: "jp" },
-            { code: "AUD", flag: "au" },
-            { code: "NZD", flag: "nz" },
-            { code: "CAD", flag: "ca" },
-            { code: "CHF", flag: "ch" },
-            { code: "CNY", flag: "cn" }
+            { code: "USD", flag: "us" }, { code: "EUR", flag: "eu" }, { code: "GBP", flag: "gb" },
+            { code: "JPY", flag: "jp" }, { code: "AUD", flag: "au" }, { code: "NZD", flag: "nz" },
+            { code: "CAD", flag: "ca" }, { code: "CHF", flag: "ch" }, { code: "CNY", flag: "cn" }
         ];
 
         const state = {
-            events: [],
-            lastUpdated: null,
-            loading: false,
-            activeRange: "7days",
-            impacts: new Set(["high", "medium", "low"]),
-            currency: "all",
-            refreshTimer: null
+            events: [], lastUpdated: null, loading: false, activeRange: "7days",
+            impacts: new Set(["high", "medium", "low"]), currency: "all", refreshTimer: null
         };
 
         const elements = {};
+        let timerInterval = null; // Har daqiqada taymerni yangilash uchun
 
-        function getLastUpdate() {
-            const value = Number(localStorage.getItem(LAST_UPDATE_KEY) || 0);
-            return Number.isFinite(value) ? value : 0;
-        }
-
-        function isRefreshDue(force = false) {
-            return force || !getLastUpdate() || Date.now() - getLastUpdate() >= UPDATE_INTERVAL_MS;
-        }
-
-        function getTashkentDateKey(date = new Date()) {
-            return new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
-        }
-
+        function getLastUpdate() { return Number(localStorage.getItem(LAST_UPDATE_KEY) || 0); }
+        function isRefreshDue(force = false) { return force || !getLastUpdate() || Date.now() - getLastUpdate() >= UPDATE_INTERVAL_MS; }
+        function getTashkentDateKey(date = new Date()) { return new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(date); }
+        
         function shiftDateKey(dateKey, offsetDays) {
             const [year, month, day] = dateKey.split("-").map(Number);
             const date = new Date(Date.UTC(year, month - 1, day + offsetDays));
@@ -551,8 +366,7 @@
             const raw = event.ts ?? event.timestamp ?? event.time ?? event.date;
             if (!raw) return null;
             let date = (typeof raw === "number" || /^\d{10,13}$/.test(String(raw))) 
-                ? new Date(Number(String(raw).length === 10 ? raw * 1000 : raw)) 
-                : new Date(raw);
+                ? new Date(Number(String(raw).length === 10 ? raw * 1000 : raw)) : new Date(raw);
             return Number.isNaN(date.getTime()) ? null : getTashkentDateKey(date);
         }
 
@@ -568,26 +382,38 @@
             const timestamp = Number(event.ts ?? event.timestamp);
             const rawTime = event.time ?? event.date ?? "";
             const parsedDate = Number.isFinite(timestamp) && timestamp > 0
-                ? new Date(String(timestamp).length === 10 ? timestamp * 1000 : timestamp)
-                : new Date(rawTime);
+                ? new Date(String(timestamp).length === 10 ? timestamp * 1000 : timestamp) : new Date(rawTime);
 
             return {
                 id: String(event.id ?? event.event_id ?? `${event.currency ?? ""}_${event.title ?? event.event ?? ""}_${event.ts ?? index}`),
                 currency: String(event.currency ?? event.country_currency ?? "").toUpperCase(),
                 country: String(event.country ?? event.country_code ?? ""),
                 title: String(event.title ?? event.event ?? event.name ?? "Untitled event"),
-                time: parsedDate,
-                dateKey: getEventDateKey(event),
+                time: parsedDate, dateKey: getEventDateKey(event),
                 impact: normalizeImpact(event.impact ?? event.impact_level),
-                actual: event.actual ?? null,
-                forecast: event.forecast ?? event.consensus ?? null,
-                previous: event.previous ?? null
+                actual: event.actual ?? null, forecast: event.forecast ?? event.consensus ?? null, previous: event.previous ?? null
             };
         }
 
         function formatTime(date) {
             if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "—";
             return new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
+        }
+
+        // Yangilikkacha yoki keyin qancha vaqt o'tganini HH:MM shaklida hisoblash
+        function getCountdown(targetDate) {
+            if (!(targetDate instanceof Date) || Number.isNaN(targetDate.getTime())) return null;
+            
+            const now = new Date();
+            const diffMs = targetDate.getTime() - now.getTime();
+            const isPast = diffMs < 0;
+            const absMs = Math.abs(diffMs);
+
+            const hours = Math.floor(absMs / (1000 * 60 * 60));
+            const minutes = Math.floor((absMs % (1000 * 60 * 60)) / (1000 * 60));
+            
+            const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            return { text: timeStr, isPast };
         }
 
         function escapeHTML(value) {
@@ -629,8 +455,7 @@
                 item.addEventListener("click", () => {
                     const code = item.dataset.currency;
                     state.currency = (state.currency === code) ? "all" : code;
-                    renderCurrencyList();
-                    renderEvents();
+                    renderCurrencyList(); renderEvents();
                 });
             });
         }
@@ -657,12 +482,21 @@
             elements.list.innerHTML = events.map(event => {
                 const currData = CURRENCIES.find(c => c.code === event.currency);
                 const flagHtml = currData && currData.flag 
-                    ? `<img src="https://flagcdn.com/w20/${currData.flag}.png" class="ec-flag" alt="${event.currency}">` 
-                    : "";
+                    ? `<img src="https://flagcdn.com/w20/${currData.flag}.png" class="ec-flag" alt="${event.currency}">` : "";
+
+                // Vaqt va Taymerni hisoblash
+                const countdown = getCountdown(event.time);
+                const timerClass = countdown && countdown.isPast ? "past" : "future";
+                const timerText = countdown ? countdown.text : "—";
 
                 return `
-                <article class="ec-event">
-                    <div class="ec-event-time">${formatTime(event.time)}</div>
+                <article class="ec-event" data-time="${event.time.getTime()}">
+                    <div class="ec-time-col">
+                        <div class="ec-event-time">${formatTime(event.time)}</div>
+                        <div class="ec-event-timer ${timerClass}">
+                            ${countdown && countdown.isPast ? '↓' : '↑'} ${timerText}
+                        </div>
+                    </div>
                     <div class="ec-event-main">
                         <div class="ec-event-heading">
                             ${flagHtml}
@@ -677,6 +511,33 @@
                     <div class="ec-event-value"><span class="ec-value-label">Previous</span><strong>${escapeHTML(event.previous ?? "—")}</strong></div>
                 </article>`;
             }).join("");
+
+            // Yangi ma'lumotlar chiqqandan so'ng taymerni ishga tushirish
+            startTimerUpdates();
+        }
+
+        // Har bir daqiqada taymerlarni yangilab turuvchi funksiya
+        function startTimerUpdates() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                const eventElements = document.querySelectorAll(".ec-event");
+                if (!eventElements.length) return;
+
+                eventElements.forEach(el => {
+                    const eventTime = Number(el.getAttribute("data-time"));
+                    if (!eventTime) return;
+                    
+                    const timerEl = el.querySelector(".ec-event-timer");
+                    if (!timerEl) return;
+
+                    const countdown = getCountdown(new Date(eventTime));
+                    if (!countdown) return;
+
+                    timerEl.className = `ec-event-timer ${countdown.isPast ? 'past' : 'future'}`;
+                    timerEl.innerHTML = `${countdown.isPast ? '↓' : '↑'} ${countdown.text}`;
+                });
+            }, 60000); // 60000 ms = 1 daqiqa
         }
 
         async function fetchEvents() {
