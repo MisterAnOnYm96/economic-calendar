@@ -43,7 +43,7 @@
         }
 
         .ec-header {
-            margin-bottom: 12px; /* Kichraytirildi */
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -73,28 +73,39 @@
         .ec-refresh:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
         .ec-refresh:disabled { opacity: .6; cursor: wait; }
 
-        /* ================= YANGILANISH HOLATI (CHAP VA O'NG) ================= */
+        /* ================= STATUS (OXIRGI VA KEYINGI YANGILANISH) ================= */
+        .ec-status-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: var(--ec-muted);
+            background: var(--ec-panel);
+            border: 1px solid var(--ec-border);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
         .ec-status-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px; /* Kichraytirildi */
-            font-size: 12px;
-            color: var(--ec-muted);
+            width: 100%;
         }
+        
         .ec-status-row .ec-status-text { font-weight: 500; }
         .ec-status-row .ec-status-time { font-weight: 700; color: var(--ec-accent); }
         
-        /* Xatolik va oflayn holatlar uchun */
         .ec-status-row[data-state="error"] .ec-status-time,
         .ec-status-row[data-state="offline"] .ec-status-time { color: #f28b82; }
-        .ec-status-row[data-state="ok"] .ec-status-time { color: var(--ec-accent); } /* vaqtni ko'k qildik */
+        .ec-status-row[data-state="ok"] .ec-status-time { color: var(--ec-accent); }
 
         .ec-toolbar {
             display: flex; align-items: center; justify-content: space-between;
             flex-wrap: nowrap; gap: 6px;
             background: var(--ec-panel); border: 1px solid var(--ec-border);
-            border-radius: 10px; padding: 6px; margin-bottom: 12px; /* Padding kichraytirildi */
+            border-radius: 10px; padding: 6px; margin-bottom: 12px;
         }
 
         .ec-range-tabs { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; scrollbar-width: none; }
@@ -117,11 +128,6 @@
         }
         .ec-filter-btn svg { width: 18px; height: 18px; }
         .ec-filter-btn:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
-
-        .ec-meta {
-            display: flex; align-items: center; justify-content: space-between;
-            color: var(--ec-muted); font-size: 10px; margin: 0 2px 8px;
-        }
 
         /* ================= YANGILIKLAR RO'YXATI ================= */
         .ec-events-list {
@@ -358,13 +364,12 @@
             .ec-header h1 { font-size: clamp(28px, 4vw, 42px); }
             .ec-footer { font-size: 13px; }
             .ec-refresh { width: 48px; height: 48px; font-size: 24px; border-radius: 12px; }
-            .ec-status-row { font-size: 14px; margin-bottom: 12px; }
+            .ec-status-container { font-size: 14px; padding: 12px 16px; margin-bottom: 16px; }
             .ec-toolbar { padding: 8px; gap: 8px; margin-bottom: 16px; border-radius: 12px; }
             .ec-range-tabs { gap: 6px; }
             .ec-range-tabs button { padding: 10px 16px; font-size: 14px; border-radius: 8px; }
             .ec-filter-btn { width: 44px; height: 44px; border-radius: 8px; }
             .ec-filter-btn svg { width: 20px; height: 20px; }
-            .ec-meta { font-size: 12px; margin: 0 2px 10px; }
             .ec-events-list { gap: 20px; }
             .ec-event-row { gap: 12px; }
             .ec-event-time-col { padding-top: 12px; }
@@ -394,10 +399,16 @@
             <button id="ec-refresh" class="ec-refresh" type="button" aria-label="Yangilash" title="Yangilash">↻</button>
         </header>
 
-        <!-- Yangilanish holati (tepadagi qator) -->
-        <div id="ec-status-row" class="ec-status-row">
-            <span class="ec-status-text" id="ec-status-text">Kalendar tayyorlanmoqda…</span>
-            <span class="ec-status-time" id="ec-status-time"></span>
+        <!-- Oxirgi yangilangan vaqt va keyingi yangilanish -->
+        <div class="ec-status-container">
+            <div class="ec-status-row" id="ec-last-updated-row">
+                <span class="ec-status-text">Oxirgi yangilangan vaqt</span>
+                <span class="ec-status-time" id="ec-last-updated-val">—</span>
+            </div>
+            <div class="ec-status-row" id="ec-status-row">
+                <span class="ec-status-text" id="ec-status-text">Kalendar tayyorlanmoqda…</span>
+                <span class="ec-status-time" id="ec-status-time"></span>
+            </div>
         </div>
 
         <section class="ec-toolbar" aria-label="Sana va filtrlar">
@@ -409,11 +420,6 @@
             <button type="button" id="ec-open-filter" class="ec-filter-btn" title="Filtr">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
             </button>
-        </section>
-
-        <section class="ec-meta">
-            <span id="ec-count">0 ta yangilik</span>
-            <span id="ec-last-updated">Hali yangilanmagan</span>
         </section>
 
         <div id="ec-events" class="ec-events-list">
@@ -464,7 +470,8 @@
             events: [], lastUpdated: null, loading: false,
             activeRange: "today",
             impacts: new Set(["high", "medium", "low"]),
-            currencies: new Set(), refreshTimer: null
+            currencies: new Set(), refreshTimer: null,
+            statusInterval: null // Status vaqtini yangilash uchun interval
         };
 
         const elements = {};
@@ -602,11 +609,6 @@
             if (!elements.list) return;
             const events = getFilteredEvents();
 
-            elements.count.textContent = `${events.length} ta yangilik`;
-            elements.lastUpdated.textContent = state.lastUpdated
-                ? `Oxiri: ${new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, dateStyle: "short", timeStyle: "short" }).format(state.lastUpdated)} (Toshkent)`
-                : "Hali yangilanmagan";
-
             if (!events.length) {
                 elements.list.innerHTML = `<div class="ec-empty"><strong>Yangilik topilmadi</strong><span>Tanlangan filtrlarga mos ma'lumot yo'q.</span></div>`;
                 return;
@@ -699,26 +701,20 @@
             elements.list.innerHTML = htmlContent;
         }
 
-        async function fetchEvents() {
-            const url = new URL(API_URL);
-            url.searchParams.set("impact", "all");
-            url.searchParams.set("days", "7");
-
-            const response = await fetch(url.toString(), { headers: { "Accept": "application/json" }, cache: "no-store" });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-            const payload = await response.json();
-            const rawEvents = Array.isArray(payload) ? payload : payload.events;
-            if (!Array.isArray(rawEvents)) throw new Error("API formati xato.");
-
-            state.events = rawEvents.map(normalizeEvent);
-            state.lastUpdated = new Date();
-            localStorage.setItem(LAST_UPDATE_KEY, String(state.lastUpdated.getTime()));
-            renderEvents();
-        }
-
-        function updateNextUpdateTimeText() {
+        function updateStatusUI() {
             const last = getLastUpdate();
+            
+            // 1. Oxirgi yangilangan vaqtni formatlash (hh:mm dd.mm.yy)
+            if (last) {
+                const d = new Date(last);
+                const pad = (n) => String(n).padStart(2, "0");
+                const formatted = `${pad(d.getHours())}:${pad(d.getMinutes())} ${pad(d.getDate())}.${pad(d.getMonth()+1)}.${String(d.getFullYear()).slice(-2)}`;
+                elements.lastUpdatedVal.textContent = formatted;
+            } else {
+                elements.lastUpdatedVal.textContent = "—";
+            }
+
+            // 2. Keyingi yangilanish vaqtini hisoblash
             if (!last) {
                 elements.statusText.textContent = "Kalendar tayyorlanmoqda…";
                 elements.statusTime.textContent = "";
@@ -741,9 +737,27 @@
             const minutes = totalMinutes % 60;
             const timeStr = hours > 0 ? `${hours} h ${minutes} m` : `${minutes} m`;
 
-            elements.statusText.textContent = "Keyingi yangilanishning taxminiy vaqti:";
+            elements.statusText.textContent = "Keyingi yangilanishgacha taxminiy vaqt:";
             elements.statusTime.textContent = timeStr;
             elements.statusRow.dataset.state = "ok";
+        }
+
+        async function fetchEvents() {
+            const url = new URL(API_URL);
+            url.searchParams.set("impact", "all");
+            url.searchParams.set("days", "7");
+
+            const response = await fetch(url.toString(), { headers: { "Accept": "application/json" }, cache: "no-store" });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const payload = await response.json();
+            const rawEvents = Array.isArray(payload) ? payload : payload.events;
+            if (!Array.isArray(rawEvents)) throw new Error("API formati xato.");
+
+            state.events = rawEvents.map(normalizeEvent);
+            state.lastUpdated = new Date();
+            localStorage.setItem(LAST_UPDATE_KEY, String(state.lastUpdated.getTime()));
+            renderEvents();
         }
 
         async function updateCalendar(force = false) {
@@ -757,7 +771,7 @@
             
             if (!isRefreshDue(force)) {
                 state.lastUpdated = getLastUpdate() ? new Date(getLastUpdate()) : null;
-                updateNextUpdateTimeText();
+                updateStatusUI();
                 renderEvents();
                 scheduleNextRefresh();
                 return;
@@ -772,7 +786,7 @@
 
             try {
                 await fetchEvents();
-                updateNextUpdateTimeText();
+                updateStatusUI();
             } catch (error) {
                 elements.statusText.textContent = "Xatolik yuz berdi";
                 elements.statusTime.textContent = "";
@@ -791,9 +805,9 @@
             if (remaining > 0) {
                 state.refreshTimer = setTimeout(() => updateCalendar(), remaining);
             }
-            // Har daqiqada status vaqtini yangilab turish uchun interval
+            // Har daqiqada status vaqtini yangilab turish
             if (!state.statusInterval) {
-                state.statusInterval = setInterval(updateNextUpdateTimeText, 60000);
+                state.statusInterval = setInterval(updateStatusUI, 60000);
             }
         }
 
@@ -825,14 +839,14 @@
 
         function init() {
             elements.list = document.getElementById("ec-events");
-            elements.count = document.getElementById("ec-count");
-            elements.lastUpdated = document.getElementById("ec-last-updated");
             elements.refresh = document.getElementById("ec-refresh");
             elements.currencyList = document.getElementById("ec-currency-list");
             elements.modalOverlay = document.getElementById("ec-modal-overlay");
             elements.openFilterBtn = document.getElementById("ec-open-filter");
             elements.closeFilterBtn = document.getElementById("ec-close-filter");
             
+            // Status elementlari
+            elements.lastUpdatedVal = document.getElementById("ec-last-updated-val");
             elements.statusRow = document.getElementById("ec-status-row");
             elements.statusText = document.getElementById("ec-status-text");
             elements.statusTime = document.getElementById("ec-status-time");
