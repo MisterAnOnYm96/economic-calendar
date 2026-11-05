@@ -24,6 +24,9 @@
             --ec-medium-text: #f5c36b;
             --ec-low-bg: #173e32;
             --ec-low-text: #65d6a0;
+            
+            /* Yangi qizil chegara rangi */
+            --ec-card-border-left: #f05252; 
         }
 
         body {
@@ -108,6 +111,8 @@
         .ec-event-card {
             background: var(--ec-panel);
             border: 1px solid var(--ec-border);
+            /* Chap tomonga qalinroq qizil chiziq qo'shildi */
+            border-left: 4px solid var(--ec-card-border-left);
             border-radius: 14px;
             padding: 16px;
             display: grid;
@@ -142,11 +147,11 @@
         .ec-event-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
         .ec-event-country { color: var(--ec-muted); font-size: 11px; margin-top: 4px; }
 
-        /* ================= ACT, FOR, PRE (IXCHAM VA CHIZIQLI) ================= */
+        /* ================= ACT, FOR, PRE ================= */
         .ec-values-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 0; /* Orasidagi masofa olib tashlandi, chiziqlar bilan ajratamiz */
+            gap: 0;
         }
 
         .ec-value-box {
@@ -154,20 +159,17 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            gap: 2px; /* Nom va qiymat orasidagi masofa */
-            /* Fon va border olib tashlandi */
+            gap: 2px;
             padding: 2px 4px; 
-            min-height: auto; 
         }
 
-        /* O'rtadagi katakchalarga xira vertikal chiziq */
         .ec-value-box + .ec-value-box {
             border-left: 1px solid var(--ec-border);
         }
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 10px; /* Kichraytirildi */
+            font-size: 10px;
             font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1;
@@ -175,7 +177,7 @@
 
         .ec-value-box strong {
             font-weight: 700;
-            font-size: 12px; /* Kichraytirildi */
+            font-size: 12px;
             font-variant-numeric: tabular-nums;
             color: var(--ec-text);
             line-height: 1.2;
@@ -255,7 +257,8 @@
             
             .ec-event-card {
                 grid-template-columns: 1fr;
-                gap: 10px; padding: 13px 11px; position: relative;
+                gap: 10px; padding: 13px 11px; padding-left: 14px; /* Qizil chiziq uchun chapdan joy */
+                position: relative;
             }
             .ec-event-time {
                 position: absolute; top: 13px; right: 11px;
