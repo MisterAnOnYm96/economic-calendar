@@ -101,35 +101,35 @@
         .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: #f28b82; }
         .ec-status[data-state="ok"] { color: #6fd3a4; }
 
-        /* ================= YANGILIKLAR RO'YXATI (VAQT CHAPDA, KARTOCHKA O'NGDA) ================= */
+        /* ================= YANGILIKLAR RO'YXATI (1/5 VA 4/5) ================= */
         .ec-events-list {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            width: 100%; /* To'liq kenglik */
+            width: 100%;
         }
 
         .ec-event-row {
             display: flex;
-            align-items: flex-start; /* Vaqt tepada turishi uchun */
+            align-items: flex-start;
             gap: 8px;
             width: 100%;
         }
 
-        /* Vaqt qismi (Chap tomonda, 1/4 qism) */
+        /* Vaqt qismi (Chap tomonda, 1/5 qism) */
         .ec-event-time-col {
-            width: 25%; /* Chap 1/4 */
-            text-align: right; /* O'ngga yaqinlashtiramiz */
-            padding-top: 12px; /* Kartochka bilan bir tekisda turishi uchun */
+            width: 20%; /* 1/5 qism */
+            text-align: right;
+            padding-top: 12px;
             font-variant-numeric: tabular-nums;
             color: var(--ec-muted);
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 13px; /* Kattalashtirildi */
+            font-weight: 700;
         }
 
-        /* Kartochka qismi (O'ng tomonda, 3/4 qism) */
+        /* Kartochka qismi (O'ng tomonda, 4/5 qism) */
         .ec-event-card {
-            width: 75%; /* O'ng 3/4 */
+            width: 80%; /* 4/5 qism */
             background: var(--ec-panel);
             border: 1px solid var(--ec-border);
             border-radius: 10px;
@@ -146,17 +146,27 @@
         .ec-card-low { border-left-color: var(--ec-low-text) !important; }
         .ec-card-unknown { border-left-color: var(--ec-muted) !important; }
 
-        .ec-event-heading { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
+        .ec-event-heading { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
         
         .ec-flag {
-            width: 14px; height: 10px; border-radius: 2px;
+            width: 16px; height: 11px; border-radius: 2px;
             object-fit: cover; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .ec-currency { color: var(--ec-accent); font-weight: 700; font-size: 10px; }
+        .ec-currency { 
+            color: var(--ec-accent); 
+            font-weight: 700; 
+            font-size: 13px; /* Kattalashtirildi */
+        }
 
-        .ec-event-title { font-size: 12px; font-weight: 600; line-height: 1.2; word-break: break-word; }
-        .ec-event-country { color: var(--ec-muted); font-size: 9px; margin-top: 2px; }
+        .ec-event-title { 
+            font-size: 14px; /* Kattalashtirildi */
+            font-weight: 600; 
+            line-height: 1.3; 
+            word-break: break-word; 
+        }
+        
+        .ec-event-country { color: var(--ec-muted); font-size: 10px; margin-top: 2px; }
 
         /* ================= ACT, FOR, PRE ================= */
         .ec-values-row {
@@ -182,7 +192,7 @@
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 8px;
+            font-size: 9px;
             font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1;
@@ -190,7 +200,7 @@
 
         .ec-value-box strong {
             font-weight: 700;
-            font-size: 10px;
+            font-size: 11px;
             font-variant-numeric: tabular-nums;
             color: var(--ec-text);
             line-height: 1.2;
@@ -279,14 +289,15 @@
             .ec-meta { font-size: 12px; margin: 0 2px 10px; }
             .ec-status { font-size: 12px; min-height: 16px; margin-bottom: 12px; }
             .ec-events-list { gap: 12px; }
-            .ec-event-time-col { font-size: 13px; padding-top: 16px; }
+            .ec-event-row { gap: 12px; }
+            .ec-event-time-col { font-size: 15px; padding-top: 16px; } /* Kattaroq ekranda yana biroz kattaroq */
             .ec-event-card { padding: 14px 16px; border-radius: 12px; gap: 10px; }
-            .ec-flag { width: 16px; height: 11px; }
-            .ec-currency { font-size: 11px; }
-            .ec-event-title { font-size: 14px; }
-            .ec-event-country { font-size: 10px; }
+            .ec-flag { width: 18px; height: 13px; }
+            .ec-currency { font-size: 14px; }
+            .ec-event-title { font-size: 16px; }
+            .ec-event-country { font-size: 11px; }
             .ec-value-label { font-size: 10px; }
-            .ec-value-box strong { font-size: 12px; }
+            .ec-value-box strong { font-size: 13px; }
             .ec-impact-filter label { padding: 12px; font-size: 13px; }
             .ec-currency-item { padding: 14px 10px; }
             .ec-currency-item img { width: 28px; height: 20px; }
@@ -513,7 +524,6 @@
 
                 const borderClass = `ec-card-${event.impact}`;
 
-                // Vaqt chap ustunga, kartochka o'ngga joylashtirildi
                 return `
                 <div class="ec-event-row">
                     <div class="ec-event-time-col">${formatTime(event.time)}</div>
