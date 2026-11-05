@@ -73,7 +73,6 @@
         .ec-refresh:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
         .ec-refresh:disabled { opacity: .6; cursor: wait; }
 
-        /* ================= STATUS ================= */
         .ec-status-container {
             display: flex;
             flex-direction: column;
@@ -129,7 +128,6 @@
         .ec-filter-btn svg { width: 18px; height: 18px; }
         .ec-filter-btn:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
 
-        /* ================= YANGILIKLAR RO'YXATI ================= */
         .ec-events-list {
             display: flex;
             flex-direction: column;
@@ -150,7 +148,6 @@
             filter: grayscale(30%);
         }
 
-        /* ================= BADGE VA CHIZIQ ================= */
         .ec-section-header {
             display: flex;
             align-items: center;
@@ -193,7 +190,6 @@
         .ec-badge.is-date + .ec-section-line { background: var(--ec-accent); opacity: 0.3; }
         .ec-badge.is-time + .ec-section-line { background: var(--ec-red); opacity: 0.3; }
 
-        /* Vaqt qismi */
         .ec-event-time-col {
             width: 20%;
             text-align: right;
@@ -221,7 +217,6 @@
             white-space: nowrap;
         }
 
-        /* Kartochka qismi */
         .ec-event-card {
             width: 80%;
             background: var(--ec-panel);
@@ -251,7 +246,6 @@
         .ec-event-title { font-size: 14px; font-weight: 600; line-height: 1.3; word-break: break-word; }
         .ec-event-country { color: var(--ec-muted); font-size: 10px; margin-top: 2px; }
 
-        /* ================= ACTUAL, FORECAST, PREVIOUS ================= */
         .ec-values-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -275,7 +269,7 @@
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 8px; /* Uzunroq so'zlar uchun kichraytirildi */
+            font-size: 8px;
             font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1;
@@ -301,7 +295,6 @@
         .ec-empty span { font-size: 10px; }
         .ec-footer { padding: 14px 2px; text-align: center; }
 
-        /* ================= MODAL ================= */
         .ec-modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px);
@@ -358,7 +351,6 @@
         .ec-currency-item img { width: 24px; height: 16px; border-radius: 2px; object-fit: cover; box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         .ec-currency-item span { font-weight: 700; font-size: 12px; }
 
-        /* Katta ekranlar uchun */
         @media (min-width: 701px) {
             .ec-page { width: min(1200px, calc(100% - 32px)); padding: 24px 0 40px; }
             .ec-header { margin-bottom: 16px; gap: 12px; }
@@ -441,14 +433,13 @@
             </div>
             
             <div class="ec-impact-filter" aria-label="Impact filtri">
-                <!-- Standart: faqat High belgilangan -->
                 <label><input type="checkbox" data-impact value="high" checked><i class="dot high"></i> High</label>
                 <label><input type="checkbox" data-impact value="medium"><i class="dot medium"></i> Medium</label>
                 <label><input type="checkbox" data-impact value="low"><i class="dot low"></i> Low</label>
             </div>
 
             <div class="ec-currency-list" id="ec-currency-list">
-                <!-- JS orqali to'ldiriladi (USD standart belgilangan bo'ladi) -->
+                <!-- JS orqali to'ldiriladi -->
             </div>
         </div>
     </div>
@@ -457,6 +448,7 @@
         const API_URL = "https://showmytrades.com/api/public/calendar/v1";
         const UPDATE_INTERVAL_MS = 6 * 60 * 60 * 1000;
         const LAST_UPDATE_KEY = "economic_calendar_last_update";
+        const DATA_CACHE_KEY = "economic_calendar_data_cache"; 
         const TIME_ZONE = "Asia/Tashkent";
 
         const CURRENCIES = [
@@ -467,7 +459,6 @@
             { code: "CNY", flag: "cn" }
         ];
 
-        // Standart holatda impacts faqat "high", currencies faqat "USD"
         const state = {
             events: [], lastUpdated: null, loading: false,
             activeRange: "today",
@@ -482,6 +473,35 @@
         function getLastUpdate() {
             const value = Number(localStorage.getItem(LAST_UPDATE_KEY) || 0);
             return Number.isFinite(value) ? value : 0;
+        }
+
+        function loadCachedData() {
+            try {
+                const cached = sessionStorage.getItem(DATA_CACHE_KEY);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    state.events = parsed.map(ev => ({
+                        ...ev,
+                        time: new Date(ev.time)
+                    }));
+                    return true;
+                }
+            } catch (e) {
+                console.warn("Keshni o'qishda xatolik", e);
+            }
+            return false;
+        }
+
+        function saveCachedData() {
+            try {
+                const toSave = state.events.map(ev => ({
+                    ...ev,
+                    time: ev.time instanceof Date ? ev.time.toISOString() : ev.time
+                }));
+                sessionStorage.setItem(DATA_CACHE_KEY, JSON.stringify(toSave));
+            } catch (e) {
+                console.warn("Keshni saqlashda xatolik", e);
+            }
         }
 
         function isRefreshDue(force = false) {
@@ -666,7 +686,6 @@
                     }
                 }
 
-                // ACT, FOR, PRE o'rniga to'liq yozildi
                 htmlContent += `
                 <div class="ec-event-row ${isPast ? 'is-past' : ''}">
                     <div class="ec-event-time-col">
@@ -759,6 +778,7 @@
             state.events = rawEvents.map(normalizeEvent);
             state.lastUpdated = new Date();
             localStorage.setItem(LAST_UPDATE_KEY, String(state.lastUpdated.getTime()));
+            saveCachedData(); 
             renderEvents();
         }
 
@@ -793,6 +813,7 @@
                 elements.statusText.textContent = "Xatolik yuz berdi";
                 elements.statusTime.textContent = "";
                 elements.statusRow.dataset.state = "error";
+                if (loadCachedData()) renderEvents();
             } finally {
                 state.loading = false;
                 elements.refresh.disabled = false;
@@ -854,16 +875,35 @@
             renderCurrencyList();
             bindControls();
 
+            // Keshdan yuklash
+            const hasCache = loadCachedData();
             const savedTimestamp = getLastUpdate();
             if (savedTimestamp) {
                 state.lastUpdated = new Date(savedTimestamp);
-                renderEvents();
             }
 
-            updateCalendar();
+            if (hasCache) {
+                renderEvents();
+                updateStatusUI();
+            }
+
+            // API ga faqat quyidagi hollarda murojaat qilamiz:
+            // 1. Kesh bo'sh bo'lsa (!hasCache)
+            // 2. 6 soatlik vaqt o'tgan bo'lsa (isRefreshDue())
+            // Aks holda, hech qanday orqa fon so'rovi yuborilmaydi
+            if (!hasCache || isRefreshDue()) {
+                updateCalendar();
+            } else {
+                updateStatusUI();
+                scheduleNextRefresh();
+            }
+
             window.addEventListener("online", () => updateCalendar());
             document.addEventListener("visibilitychange", () => {
-                if (document.visibilityState === "visible") updateCalendar();
+                if (document.visibilityState === "visible") {
+                    // Faqat vaqt o'tgan bo'lsa yoki kesh bo'lmasa yangilaymiz
+                    if (isRefreshDue()) updateCalendar();
+                }
             });
         }
 
