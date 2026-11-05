@@ -58,7 +58,6 @@
             margin: 0;
         }
 
-        /* Yangilash tugmasi Rounded Square shaklida */
         .ec-refresh {
             border: 1px solid var(--ec-border);
             border-radius: 12px;
@@ -75,22 +74,16 @@
             flex-shrink: 0;
         }
 
-        .ec-refresh:hover {
-            border-color: var(--ec-accent);
-            color: var(--ec-accent);
-        }
+        .ec-refresh:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
+        .ec-refresh:disabled { opacity: .6; cursor: wait; }
 
-        .ec-refresh:disabled {
-            opacity: .6;
-            cursor: wait;
-        }
-
+        /* Kunlar va Filtr tugmasi bir qatorda turishi uchun tuzatildi */
         .ec-toolbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
+            flex-wrap: nowrap; /* Pastga tushishni oldini oladi */
+            gap: 10px;
             background: var(--ec-panel);
             border: 1px solid var(--ec-border);
             border-radius: 14px;
@@ -112,6 +105,7 @@
             color: var(--ec-muted);
             cursor: pointer;
             font-size: 13px;
+            white-space: nowrap; /* Matn buzilib tushmasligi uchun */
         }
 
         .ec-range-tabs button.is-active {
@@ -120,7 +114,7 @@
             color: #fff;
         }
 
-        /* Filtr tugmasi (Faqat belgi) */
+        /* Filtr tugmasi ixcham va o'ngga mahkamlangan */
         .ec-filter-btn {
             border: 1px solid var(--ec-border);
             border-radius: 8px;
@@ -132,12 +126,10 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            flex-shrink: 0; /* Siqilib qolmasligi uchun */
         }
 
-        .ec-filter-btn:hover {
-            border-color: var(--ec-accent);
-            color: var(--ec-accent);
-        }
+        .ec-filter-btn:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
 
         .ec-meta {
             display: flex;
@@ -270,7 +262,7 @@
             text-align: center;
         }
 
-        /* ================= MODAL (PASTDAN CHIQADIGAN OYNA) ================= */
+        /* ================= MODAL ================= */
         .ec-modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -282,10 +274,7 @@
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
-        .ec-modal-overlay.is-open {
-            opacity: 1;
-            visibility: visible;
-        }
+        .ec-modal-overlay.is-open { opacity: 1; visibility: visible; }
 
         .ec-modal {
             position: fixed;
@@ -302,9 +291,7 @@
             box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
         }
 
-        .ec-modal-overlay.is-open .ec-modal {
-            transform: translateY(0);
-        }
+        .ec-modal-overlay.is-open .ec-modal { transform: translateY(0); }
 
         .ec-modal-header {
             display: flex;
@@ -315,10 +302,7 @@
             border-bottom: 1px solid var(--ec-border);
         }
 
-        .ec-modal-header h2 {
-            margin: 0;
-            font-size: 18px;
-        }
+        .ec-modal-header h2 { margin: 0; font-size: 18px; }
 
         .ec-modal-close {
             background: transparent;
@@ -329,7 +313,6 @@
             padding: 0;
         }
 
-        /* Darajalar to'liq qatorni egallaydi */
         .ec-impact-filter {
             display: flex;
             gap: 10px;
@@ -358,9 +341,7 @@
             color: var(--ec-text);
         }
 
-        .ec-impact-filter input {
-            display: none;
-        }
+        .ec-impact-filter input { display: none; }
 
         .dot {
             width: 8px;
@@ -372,27 +353,25 @@
         .dot.medium { background: #e9a23b; }
         .dot.low { background: #35b779; }
 
-        /* Valyutalar (Ixcham va 2 qatorga sig'adigan) */
+        /* ================= VALYUTALAR (Aynan 3 QATORGA MOSLASHTIRILDI) ================= */
         .ec-currency-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 ta ustun */
+            gap: 10px; /* Kartochkalar orasidagi masofa */
             padding-bottom: 20px;
         }
 
         .ec-currency-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            gap: 8px;
             background: var(--ec-panel-2);
-            padding: 6px 10px;
-            border-radius: 8px;
+            padding: 14px 10px; /* Kattaroq qilindi */
+            border-radius: 10px;
             cursor: pointer;
             border: 1px solid transparent;
             transition: all 0.2s;
-            flex: 1 1 calc(25% - 8px); /* 4 tadan joylashishga moslashadi */
-            min-width: 65px;
-            justify-content: center;
         }
 
         .ec-currency-item:hover, .ec-currency-item.is-active {
@@ -401,16 +380,16 @@
         }
 
         .ec-currency-item img {
-            width: 20px;
-            height: 14px;
-            border-radius: 2px;
+            width: 28px; /* Bayroq kattalashtirildi */
+            height: 20px;
+            border-radius: 3px;
             object-fit: cover;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
         .ec-currency-item span {
             font-weight: 700;
-            font-size: 11px;
+            font-size: 14px; /* Matn kattalashtirildi */
         }
 
         /* Mobil moslashuv */
@@ -445,6 +424,10 @@
             .ec-event-value .ec-value-label { margin-top: 0; font-size: 9px; }
             .ec-event-value strong { font-size: 11px; }
             .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
+            
+            /* Mobil telefonda ham kunlar va filtr yonma-yon turishi uchun */
+            .ec-toolbar { padding: 8px; gap: 8px; }
+            .ec-range-tabs button { padding: 8px; font-size: 12px; }
         }
     </style>
 </head>
@@ -465,7 +448,6 @@
                 <button type="button" data-range="tomorrow">Ertaga</button>
                 <button type="button" data-range="7days" class="is-active">Keyingi 7 kun</button>
             </div>
-            <!-- Filtr tugmasi (matnsiz) -->
             <button type="button" id="ec-open-filter" class="ec-filter-btn" title="Filtr">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
             </button>
@@ -497,7 +479,6 @@
         </footer>
     </main>
 
-    <!-- ================= PASTDAN CHIQADIGAN FILTR OYNASI (MODAL) ================= -->
     <div class="ec-modal-overlay" id="ec-modal-overlay">
         <div class="ec-modal">
             <div class="ec-modal-header">
@@ -505,14 +486,12 @@
                 <button class="ec-modal-close" id="ec-close-filter">&times;</button>
             </div>
             
-            <!-- Darajalar to'liq qatorni egallaydi -->
             <div class="ec-impact-filter" aria-label="Impact filtri">
                 <label><input type="checkbox" data-impact value="high" checked><i class="dot high"></i> High</label>
                 <label><input type="checkbox" data-impact value="medium" checked><i class="dot medium"></i> Medium</label>
                 <label><input type="checkbox" data-impact value="low" checked><i class="dot low"></i> Low</label>
             </div>
 
-            <!-- Valyutalar (Faqat kodi va bayrog'i) -->
             <div class="ec-currency-list" id="ec-currency-list">
                 <!-- JS orqali to'ldiriladi -->
             </div>
@@ -525,7 +504,6 @@
         const LAST_UPDATE_KEY = "economic_calendar_last_update";
         const TIME_ZONE = "Asia/Tashkent";
 
-        // Valyutalar ro'yxati (Faqat kod va bayroq)
         const CURRENCIES = [
             { code: "USD", flag: "us" },
             { code: "EUR", flag: "eu" },
@@ -635,14 +613,13 @@
                 .sort((a, b) => (a.time?.getTime() || 0) - (b.time?.getTime() || 0));
         }
 
-        // --- UI Render ---
         function renderCurrencyList() {
             if (!elements.currencyList) return;
             elements.currencyList.innerHTML = CURRENCIES.map(curr => {
                 const isActive = (state.currency === curr.code);
                 return `
                     <div class="ec-currency-item ${isActive ? 'is-active' : ''}" data-currency="${curr.code}">
-                        <img src="https://flagcdn.com/w20/${curr.flag}.png" alt="${curr.code}">
+                        <img src="https://flagcdn.com/w40/${curr.flag}.png" alt="${curr.code}">
                         <span>${curr.code}</span>
                     </div>
                 `;
@@ -651,7 +628,6 @@
             elements.currencyList.querySelectorAll(".ec-currency-item").forEach(item => {
                 item.addEventListener("click", () => {
                     const code = item.dataset.currency;
-                    // Agar bir xil valyuta bosilsa, filtrdan chiqarish (ALL ga qaytish)
                     state.currency = (state.currency === code) ? "all" : code;
                     renderCurrencyList();
                     renderEvents();
@@ -703,7 +679,6 @@
             }).join("");
         }
 
-        // --- API va Logic ---
         async function fetchEvents() {
             const url = new URL(API_URL);
             url.searchParams.set("impact", "all");
@@ -765,7 +740,6 @@
             elements.status.dataset.state = type;
         }
 
-        // --- Event Listeners ---
         function bindControls() {
             document.querySelectorAll("[data-range]").forEach(button => {
                 button.addEventListener("click", () => {
