@@ -98,27 +98,27 @@
         .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: #f28b82; }
         .ec-status[data-state="ok"] { color: #6fd3a4; }
 
-        .ec-table-wrap {
-            overflow: hidden; border: 1px solid var(--ec-border);
-            border-radius: 14px; background: var(--ec-panel);
+        /* ================= YANGILIKLAR RO'YXATI VA KARTOCHKALAR ================= */
+        .ec-events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* Har bir yangilik orasidagi masofa */
         }
 
-        /* ================= JADVAL VA EVENTLAR ================= */
-        .ec-table-head, .ec-event {
+        .ec-event-card {
+            background: var(--ec-panel);
+            border: 1px solid var(--ec-border);
+            border-radius: 14px;
+            padding: 16px;
             display: grid;
-            grid-template-columns: 76px minmax(150px, 1fr) 210px;
-            gap: 14px;
+            grid-template-columns: 76px minmax(150px, 1fr) 240px;
+            gap: 16px;
             align-items: center;
+            transition: border-color 0.2s;
         }
 
-        .ec-table-head {
-            padding: 13px 16px; background: var(--ec-panel-2);
-            color: var(--ec-muted); font-size: 11px;
-            text-transform: uppercase; letter-spacing: .05em;
-        }
-
-        .ec-event {
-            padding: 15px 16px; border-top: 1px solid var(--ec-border);
+        .ec-event-card:hover {
+            border-color: var(--ec-border-hover);
         }
 
         .ec-event-time {
@@ -144,10 +144,10 @@
         .ec-impact-low { color: var(--ec-low-text); background: var(--ec-low-bg); }
         .ec-impact-unknown { color: var(--ec-muted); background: var(--ec-panel-2); }
 
-        .ec-event-title { font-size: 13px; font-weight: 600; line-height: 1.4; }
-        .ec-event-country { color: var(--ec-muted); font-size: 10px; margin-top: 4px; }
+        .ec-event-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
+        .ec-event-country { color: var(--ec-muted); font-size: 11px; margin-top: 4px; }
 
-        /* ================= ACT, FOR, PRE KATAKCHALARI (TO'G'RILANDI) ================= */
+        /* ================= ACT, FOR, PRE (BIR XIL O'LCHAMDA) ================= */
         .ec-values-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -158,18 +158,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Tepadagi yozuv doim tepada turadi */
+            justify-content: flex-start;
             gap: 4px;
             background: var(--ec-panel-2);
             border: 1px solid var(--ec-border);
             border-radius: 8px;
-            padding: 6px 4px; /* Ichki bo'shliq kichraytirildi */
-            min-height: 54px; /* Balandlik qat'iy belgilandi */
+            padding: 8px 4px;
+            min-height: 56px;
         }
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 9px; /* Nom shrifti kichraytirildi */
+            font-size: 13px; /* Qiymat bilan bir xil o'lchamda */
             font-weight: 800;
             letter-spacing: 0.5px;
             line-height: 1;
@@ -177,18 +177,19 @@
 
         .ec-value-box strong {
             font-weight: 700;
-            font-size: 12px; /* Qiymat shrifti kichraytirildi */
+            font-size: 13px; /* Qiymat bilan bir xil o'lchamda */
             font-variant-numeric: tabular-nums;
             color: var(--ec-text);
             line-height: 1.2;
             text-align: center;
-            margin-top: auto; /* Qiymatni pastga tortadi, shunda nom doim tepada qoladi */
+            margin-top: auto;
         }
 
         .ec-empty {
             display: flex; min-height: 180px; flex-direction: column;
             align-items: center; justify-content: center; gap: 8px;
             color: var(--ec-muted); text-align: center; padding: 24px;
+            background: var(--ec-panel); border: 1px solid var(--ec-border); border-radius: 14px;
         }
         .ec-empty strong { color: var(--ec-text); }
         .ec-empty span { font-size: 12px; }
@@ -254,10 +255,9 @@
         /* Mobil moslashuv */
         @media (max-width: 700px) {
             .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
-            .ec-table-head { display: none; }
             
-            .ec-event {
-                grid-template-columns: 1fr;
+            .ec-event-card {
+                grid-template-columns: 1fr; /* Hammasini bitta ustunga */
                 gap: 10px; padding: 13px 11px; position: relative;
             }
             .ec-event-time {
@@ -267,8 +267,9 @@
             .ec-event-main { padding-right: 50px; }
             
             .ec-values-row { width: 100%; gap: 8px; }
-            .ec-value-box { padding: 8px 4px; min-height: 56px; }
-            .ec-value-box strong { font-size: 13px; }
+            .ec-value-box { padding: 10px 4px; min-height: 60px; }
+            .ec-value-box strong { font-size: 14px; }
+            .ec-value-label { font-size: 14px; }
             
             .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
             .ec-toolbar { padding: 8px; gap: 8px; }
@@ -304,18 +305,12 @@
         </section>
         <div id="ec-status" class="ec-status" role="status" aria-live="polite">Kalendar tayyorlanmoqda…</div>
 
-        <section class="ec-table-wrap" aria-label="Iqtisodiy yangiliklar">
-            <div class="ec-table-head">
-                <span>Vaqt</span>
-                <span>Yangilik</span>
-                <span>Ko'rsatkichlar</span>
+        <!-- Har bir yangilik alohida karta ko'rinishida chiqadi -->
+        <div id="ec-events" class="ec-events-list">
+            <div class="ec-empty">
+                <strong>Ma'lumot yuklanmoqda…</strong>
             </div>
-            <div id="ec-events" class="ec-events">
-                <div class="ec-empty">
-                    <strong>Ma'lumot yuklanmoqda…</strong>
-                </div>
-            </div>
-        </section>
+        </div>
 
         <footer class="ec-footer">
             Manba: ShowMyTrades · Avtomatik yangilanish: 6 soatda bir marta.
@@ -502,7 +497,7 @@
                 const valPre = (event.previous === null || event.previous === undefined || event.previous === "") ? "—" : event.previous;
 
                 return `
-                <article class="ec-event">
+                <div class="ec-event-card">
                     <div class="ec-event-time">${formatTime(event.time)}</div>
                     <div class="ec-event-main">
                         <div class="ec-event-heading">
@@ -528,7 +523,7 @@
                             <strong>${escapeHTML(valPre)}</strong>
                         </div>
                     </div>
-                </article>`;
+                </div>`;
             }).join("");
         }
 
