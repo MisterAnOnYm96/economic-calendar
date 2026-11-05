@@ -1,278 +1,439 @@
+Tushundim, valyutalarni kattaroq qilib, aniq 3 qatorga joylashtiramiz. Va asosiy ekrandagi filtr belgisini pastga tushib qolmasligi uchun kunlar (Kecha, Bugun...) bilan bir qatorga, o'ng chetiga mahkamlaymiz.
+
+Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi index.html faylingizga nusxalab qo'ying:
+
+```html
 <!doctype html>
 <html lang="uz">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#101827">
     <title>Economic Calendar</title>
     <style>
         * { box-sizing: border-box; }
 
         :root {
             color-scheme: dark;
-            --ec-bg: #000000;
-            --ec-panel: #121212;
-            --ec-panel-2: #1e1e1e;
-            --ec-border: #2a2a2a;
-            --ec-text: #ffffff;
-            --ec-muted: #888888;
-            --ec-accent: #3b82f6;
-            --ec-green: #22c55e;
-            --ec-red: #ef4444;
-            --ec-orange: #f59e0b;
+            --ec-bg: #0b1220;
+            --ec-panel: #111c2e;
+            --ec-panel-2: #172338;
+            --ec-border: #26364e;
+            --ec-text: #e8eef7;
+            --ec-muted: #91a0b6;
+            --ec-accent: #60a5fa;
         }
 
         body {
             margin: 0;
             background: var(--ec-bg);
             color: var(--ec-text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             overflow-x: hidden;
         }
 
         .ec-page {
-            width: min(600px, 100%);
+            width: min(1200px, calc(100% - 32px));
             margin: 0 auto;
-            padding: 20px 16px 40px;
+            padding: 28px 0 40px;
         }
 
-        /* Header qismi */
         .ec-header {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
         }
 
-        .ec-title-wrap { display: flex; flex-direction: column; gap: 4px; }
-        .ec-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
-        .ec-subtitle { color: var(--ec-muted); font-size: 13px; margin: 0; }
+        .ec-title-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .ec-header h1 {
+            margin: 0;
+            font-size: clamp(25px, 4vw, 34px);
+        }
+
+        .ec-subtitle, .ec-footer {
+            color: var(--ec-muted);
+            font-size: 13px;
+            margin: 0;
+        }
 
         .ec-refresh {
-            border: none;
-            border-radius: 50%;
+            border: 1px solid var(--ec-border);
+            border-radius: 12px;
             background: var(--ec-panel-2);
             color: var(--ec-text);
-            width: 44px; height: 44px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
-        }
-        .ec-refresh:hover { background: #333; }
-        .ec-refresh:disabled { opacity: .6; cursor: wait; }
-
-        /* Filtr va Kunlar paneli */
-        .ec-toolbar {
-            display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: nowrap; gap: 10px;
-            background: var(--ec-panel); border-radius: 16px;
-            padding: 8px; margin-bottom: 20px;
-        }
-
-        .ec-range-tabs {
-            display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
-        }
-        .ec-range-tabs::-webkit-scrollbar { display: none; }
-
-        .ec-range-tabs button {
-            border: none; border-radius: 12px;
-            padding: 10px 14px; background: transparent;
-            color: var(--ec-muted); cursor: pointer; font-size: 13px;
-            font-weight: 600; white-space: nowrap; transition: 0.2s;
-        }
-
-        .ec-range-tabs button.is-active {
-            background: var(--ec-panel-2); color: var(--ec-text);
-        }
-
-        .ec-filter-btn {
-            border: none; border-radius: 12px;
-            background: var(--ec-panel-2); color: var(--ec-text);
-            width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; flex-shrink: 0; transition: 0.2s;
-        }
-        .ec-filter-btn:hover { background: #333; }
-
-        /* Yangiliklar ro'yxati (Card uslubida) */
-        .ec-events-list {
+            width: 44px;
+            height: 44px;
             display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .ec-event-card {
-            display: flex;
-            background: var(--ec-panel);
-            border-radius: 16px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Chap tarafdagi rangli chiziq (High - qizil, Medium - sariq, Low - yashil) */
-        .ec-event-card::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 4px;
-            background: var(--ec-border);
-        }
-        .ec-event-card.impact-high::before { background: var(--ec-red); }
-        .ec-event-card.impact-medium::before { background: var(--ec-orange); }
-        .ec-event-card.impact-low::before { background: var(--ec-green); }
-
-        /* Chap ustun: Vaqt */
-        .ec-card-time-col {
-            width: 90px;
-            padding: 16px 10px 16px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s;
             flex-shrink: 0;
         }
 
-        .ec-card-time {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--ec-text);
-        }
+        .ec-refresh:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
+        .ec-refresh:disabled { opacity: .6; cursor: wait; }
 
-        .ec-card-timer {
-            font-size: 12px;
-            font-weight: 600;
+        /* Kunlar va Filtr tugmasi bir qatorda turishi uchun tuzatildi */
+        .ec-toolbar {
             display: flex;
             align-items: center;
-            gap: 2px;
+            justify-content: space-between;
+            flex-wrap: nowrap; /* Pastga tushishni oldini oladi */
+            gap: 10px;
+            background: var(--ec-panel);
+            border: 1px solid var(--ec-border);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 16px;
         }
-        .ec-card-timer.future { color: var(--ec-green); }
-        .ec-card-timer.past { color: var(--ec-red); }
 
-        /* O'ng ustun: Ma'lumotlar */
-        .ec-card-content {
-            flex-grow: 1;
-            padding: 16px 16px 16px 0;
+        .ec-range-tabs {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            flex-wrap: wrap;
+            gap: 7px;
         }
 
-        .ec-card-header {
+        .ec-range-tabs button {
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 9px 12px;
+            background: transparent;
+            color: var(--ec-muted);
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap; /* Matn buzilib tushmasligi uchun */
+        }
+
+        .ec-range-tabs button.is-active {
+            background: #1d3b60;
+            border-color: #315d8c;
+            color: #fff;
+        }
+
+        /* Filtr tugmasi ixcham va o'ngga mahkamlangan */
+        .ec-filter-btn {
+            border: 1px solid var(--ec-border);
+            border-radius: 8px;
+            background: var(--ec-panel-2);
+            color: var(--ec-text);
+            width: 40px;
+            height: 40px;
             display: flex;
-            align-items: flex-start;
-            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0; /* Siqilib qolmasligi uchun */
         }
 
-        .ec-card-flag {
-            width: 24px; height: 16px;
-            border-radius: 3px;
-            object-fit: cover;
-            margin-top: 2px;
-        }
+        .ec-filter-btn:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
 
-        .ec-card-title {
-            font-size: 15px;
-            font-weight: 600;
-            line-height: 1.3;
-        }
-
-        /* Daraja yulduzchalari */
-        .ec-card-stars {
+        .ec-meta {
             display: flex;
-            gap: 2px;
-            margin-top: -4px;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--ec-muted);
+            font-size: 12px;
+            margin: 0 2px 10px;
         }
-        .ec-star {
-            font-size: 14px;
-            color: #333; /* Bo'sh yulduz rangi */
-        }
-        .ec-star.active-high { color: var(--ec-red); }
-        .ec-star.active-medium { color: var(--ec-orange); }
-        .ec-star.active-low { color: var(--ec-green); }
 
-        /* Pastki qism: Forecast / Previous */
-        .ec-card-data {
-            display: flex;
+        .ec-status {
+            margin-bottom: 12px;
+            color: var(--ec-muted);
+            font-size: 12px;
+            min-height: 16px;
+        }
+
+        .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: #f28b82; }
+        .ec-status[data-state="ok"] { color: #6fd3a4; }
+
+        .ec-table-wrap {
+            overflow: hidden;
+            border: 1px solid var(--ec-border);
+            border-radius: 14px;
+            background: var(--ec-panel);
+        }
+
+        .ec-table-head, .ec-event {
+            display: grid;
+            grid-template-columns: 76px minmax(190px, 1.8fr) repeat(3, minmax(85px, .7fr));
+            gap: 14px;
+            align-items: center;
+        }
+
+        .ec-table-head {
+            padding: 13px 16px;
+            background: var(--ec-panel-2);
+            color: var(--ec-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .ec-event {
+            padding: 15px 16px;
             border-top: 1px solid var(--ec-border);
-            padding-top: 12px;
-            gap: 20px;
         }
 
-        .ec-data-item {
+        .ec-event-time {
+            font-variant-numeric: tabular-nums;
+            color: var(--ec-muted);
+            font-size: 13px;
+        }
+
+        .ec-event-heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .ec-flag {
+            width: 18px;
+            height: 13px;
+            border-radius: 2px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .ec-currency {
+            color: var(--ec-accent);
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .ec-impact {
+            border-radius: 5px;
+            padding: 3px 5px;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .ec-impact-high { color: #ff8d8d; background: #4b252e; }
+        .ec-impact-medium { color: #f5c36b; background: #49391f; }
+        .ec-impact-low { color: #65d6a0; background: #173e32; }
+        .ec-impact-unknown { color: var(--ec-muted); background: var(--ec-panel-2); }
+
+        .ec-event-title {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .ec-event-country, .ec-value-label {
+            color: var(--ec-muted);
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .ec-event-value {
             display: flex;
             flex-direction: column;
             gap: 4px;
+            font-size: 12px;
+            overflow-wrap: anywhere;
         }
 
-        .ec-data-label {
-            font-size: 10px;
-            color: var(--ec-muted);
-            text-transform: uppercase;
+        .ec-event-value strong {
             font-weight: 600;
-            letter-spacing: 0.5px;
+            font-variant-numeric: tabular-nums;
         }
 
-        .ec-data-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--ec-text);
-        }
-
-        /* Empty state */
         .ec-empty {
-            display: flex; min-height: 200px; flex-direction: column;
-            align-items: center; justify-content: center; gap: 8px;
-            color: var(--ec-muted); text-align: center; padding: 24px;
-            background: var(--ec-panel); border-radius: 16px;
+            display: flex;
+            min-height: 180px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--ec-muted);
+            text-align: center;
+            padding: 24px;
         }
-        .ec-empty strong { color: var(--ec-text); font-size: 16px; }
-        .ec-empty span { font-size: 13px; }
+
+        .ec-empty strong { color: var(--ec-text); }
+        .ec-empty span { font-size: 12px; }
+
+        .ec-footer {
+            padding: 18px 2px;
+            text-align: center;
+        }
 
         /* ================= MODAL ================= */
         .ec-modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px);
-            z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
+
         .ec-modal-overlay.is-open { opacity: 1; visibility: visible; }
 
         .ec-modal {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--ec-panel); border-top-left-radius: 24px; border-top-right-radius: 24px;
-            padding: 24px; z-index: 1001; transform: translateY(100%);
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--ec-panel);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px;
+            z-index: 1001;
+            transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 60vh; overflow-y: auto;
+            max-height: 50vh;
+            overflow-y: auto;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
         }
+
         .ec-modal-overlay.is-open .ec-modal { transform: translateY(0); }
 
         .ec-modal-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--ec-border);
         }
-        .ec-modal-header h2 { margin: 0; font-size: 20px; font-weight: 700; }
-        .ec-modal-close { background: transparent; border: none; color: var(--ec-muted); font-size: 28px; cursor: pointer; padding: 0; line-height: 1; }
 
-        .ec-impact-filter { display: flex; gap: 10px; margin-bottom: 24px; width: 100%; }
-        .ec-impact-filter label {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-            gap: 8px; background: var(--ec-panel-2); padding: 14px;
-            border-radius: 12px; color: var(--ec-muted); font-size: 14px;
-            cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
-            font-weight: 600;
+        .ec-modal-header h2 { margin: 0; font-size: 18px; }
+
+        .ec-modal-close {
+            background: transparent;
+            border: none;
+            color: var(--ec-muted);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
         }
-        .ec-impact-filter label:has(input:checked) { border-color: var(--ec-border); color: var(--ec-text); }
+
+        .ec-impact-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .ec-impact-filter label {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--ec-panel-2);
+            padding: 12px;
+            border-radius: 10px;
+            color: var(--ec-muted);
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .ec-impact-filter label:has(input:checked) {
+            border-color: var(--ec-border);
+            color: var(--ec-text);
+        }
+
         .ec-impact-filter input { display: none; }
 
-        .ec-currency-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 20px; }
-        .ec-currency-item {
-            display: flex; align-items: center; justify-content: center;
-            gap: 8px; background: var(--ec-panel-2); padding: 14px 10px;
-            border-radius: 12px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
-            font-weight: 600; font-size: 14px;
+        .dot {
+            width: 8px;
+            height: 8px;
+            display: inline-block;
+            border-radius: 50%;
         }
-        .ec-currency-item:hover, .ec-currency-item.is-active { border-color: var(--ec-accent); background: rgba(59, 130, 246, 0.1); }
-        .ec-currency-item img { width: 24px; height: 16px; border-radius: 2px; object-fit: cover; }
+        .dot.high { background: #f05252; }
+        .dot.medium { background: #e9a23b; }
+        .dot.low { background: #35b779; }
 
-        .ec-meta { display: flex; align-items: center; justify-content: space-between; color: var(--ec-muted); font-size: 12px; margin-bottom: 16px; font-weight: 500; }
-        .ec-status { margin-bottom: 16px; color: var(--ec-muted); font-size: 12px; }
+        /* ================= VALYUTALAR (Aynan 3 QATORGA MOSLASHTIRILDI) ================= */
+        .ec-currency-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 ta ustun */
+            gap: 10px; /* Kartochkalar orasidagi masofa */
+            padding-bottom: 20px;
+        }
+
+        .ec-currency-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--ec-panel-2);
+            padding: 14px 10px; /* Kattaroq qilindi */
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .ec-currency-item:hover, .ec-currency-item.is-active {
+            border-color: var(--ec-accent);
+            background: #1d3b60;
+        }
+
+        .ec-currency-item img {
+            width: 28px; /* Bayroq kattalashtirildi */
+            height: 20px;
+            border-radius: 3px;
+            object-fit: cover;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .ec-currency-item span {
+            font-weight: 700;
+            font-size: 14px; /* Matn kattalashtirildi */
+        }
+
+        /* Mobil moslashuv */
+        @media (max-width: 700px) {
+            .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
+            .ec-table-head { display: none; }
+            .ec-event {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 13px 11px;
+                position: relative;
+            }
+            .ec-event-time {
+                position: absolute;
+                top: 13px;
+                right: 11px;
+                font-size: 12px;
+                color: var(--ec-accent);
+            }
+            .ec-event-main { padding-right: 50px; }
+            .ec-event-value {
+                display: inline-flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 5px;
+                background: var(--ec-panel-2);
+                padding: 4px 8px;
+                border-radius: 6px;
+                margin-top: 4px;
+                margin-right: 5px;
+            }
+            .ec-event-value .ec-value-label { margin-top: 0; font-size: 9px; }
+            .ec-event-value strong { font-size: 11px; }
+            .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
+            
+            /* Mobil telefonda ham kunlar va filtr yonma-yon turishi uchun */
+            .ec-toolbar { padding: 8px; gap: 8px; }
+            .ec-range-tabs button { padding: 8px; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -280,46 +441,65 @@
         <header class="ec-header">
             <div class="ec-title-wrap">
                 <h1>Economic Calendar</h1>
-                <p class="ec-subtitle">Global yangiliklar · Toshkent (UTC+5)</p>
+                <p class="ec-subtitle">Global iqtisodiy yangiliklar · Toshkent vaqti (UTC+5)</p>
             </div>
-            <button id="ec-refresh" class="ec-refresh" type="button">↻</button>
+            <button id="ec-refresh" class="ec-refresh" type="button" aria-label="Yangilash" title="Yangilash">↻</button>
         </header>
 
-        <section class="ec-toolbar">
+        <section class="ec-toolbar" aria-label="Sana va filtrlar">
             <div class="ec-range-tabs">
                 <button type="button" data-range="yesterday">Kecha</button>
                 <button type="button" data-range="today">Bugun</button>
                 <button type="button" data-range="tomorrow">Ertaga</button>
                 <button type="button" data-range="7days" class="is-active">Keyingi 7 kun</button>
             </div>
-            <button type="button" id="ec-open-filter" class="ec-filter-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            <button type="button" id="ec-open-filter" class="ec-filter-btn" title="Filtr">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
             </button>
         </section>
 
         <section class="ec-meta">
             <span id="ec-count">0 ta yangilik</span>
-            <span id="ec-last-updated">Yuklanmoqda...</span>
+            <span id="ec-last-updated">Hali yangilanmagan</span>
+        </section>
+        <div id="ec-status" class="ec-status" role="status" aria-live="polite">Kalendar tayyorlanmoqda…</div>
+
+        <section class="ec-table-wrap" aria-label="Iqtisodiy yangiliklar">
+            <div class="ec-table-head">
+                <span>Vaqt</span>
+                <span>Yangilik</span>
+                <span>Actual</span>
+                <span>Forecast</span>
+                <span>Previous</span>
+            </div>
+            <div id="ec-events" class="ec-events">
+                <div class="ec-empty">
+                    <strong>Ma'lumot yuklanmoqda…</strong>
+                </div>
+            </div>
         </section>
 
-        <div id="ec-events" class="ec-events-list">
-            <div class="ec-empty"><strong>Ma'lumot yuklanmoqda…</strong></div>
-        </div>
+        <footer class="ec-footer">
+            Manba: ShowMyTrades · Avtomatik yangilanish: 6 soatda bir marta.
+        </footer>
     </main>
 
-    <!-- Modal -->
     <div class="ec-modal-overlay" id="ec-modal-overlay">
         <div class="ec-modal">
             <div class="ec-modal-header">
                 <h2>Filtrlash</h2>
                 <button class="ec-modal-close" id="ec-close-filter">&times;</button>
             </div>
-            <div class="ec-impact-filter">
-                <label><input type="checkbox" data-impact value="high" checked> High</label>
-                <label><input type="checkbox" data-impact value="medium" checked> Medium</label>
-                <label><input type="checkbox" data-impact value="low" checked> Low</label>
+            
+            <div class="ec-impact-filter" aria-label="Impact filtri">
+                <label><input type="checkbox" data-impact value="high" checked><i class="dot high"></i> High</label>
+                <label><input type="checkbox" data-impact value="medium" checked><i class="dot medium"></i> Medium</label>
+                <label><input type="checkbox" data-impact value="low" checked><i class="dot low"></i> Low</label>
             </div>
-            <div class="ec-currency-list" id="ec-currency-list"></div>
+
+            <div class="ec-currency-list" id="ec-currency-list">
+                <!-- JS orqali to'ldiriladi -->
+            </div>
         </div>
     </div>
 
@@ -330,23 +510,42 @@
         const TIME_ZONE = "Asia/Tashkent";
 
         const CURRENCIES = [
-            { code: "USD", flag: "us" }, { code: "EUR", flag: "eu" }, { code: "GBP", flag: "gb" },
-            { code: "JPY", flag: "jp" }, { code: "AUD", flag: "au" }, { code: "NZD", flag: "nz" },
-            { code: "CAD", flag: "ca" }, { code: "CHF", flag: "ch" }, { code: "CNY", flag: "cn" }
+            { code: "USD", flag: "us" },
+            { code: "EUR", flag: "eu" },
+            { code: "GBP", flag: "gb" },
+            { code: "JPY", flag: "jp" },
+            { code: "AUD", flag: "au" },
+            { code: "NZD", flag: "nz" },
+            { code: "CAD", flag: "ca" },
+            { code: "CHF", flag: "ch" },
+            { code: "CNY", flag: "cn" }
         ];
 
         const state = {
-            events: [], lastUpdated: null, loading: false, activeRange: "7days",
-            impacts: new Set(["high", "medium", "low"]), currency: "all", refreshTimer: null
+            events: [],
+            lastUpdated: null,
+            loading: false,
+            activeRange: "7days",
+            impacts: new Set(["high", "medium", "low"]),
+            currency: "all",
+            refreshTimer: null
         };
 
         const elements = {};
-        let timerInterval = null;
 
-        function getLastUpdate() { return Number(localStorage.getItem(LAST_UPDATE_KEY) || 0); }
-        function isRefreshDue(force = false) { return force || !getLastUpdate() || Date.now() - getLastUpdate() >= UPDATE_INTERVAL_MS; }
-        function getTashkentDateKey(date = new Date()) { return new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(date); }
-        
+        function getLastUpdate() {
+            const value = Number(localStorage.getItem(LAST_UPDATE_KEY) || 0);
+            return Number.isFinite(value) ? value : 0;
+        }
+
+        function isRefreshDue(force = false) {
+            return force || !getLastUpdate() || Date.now() - getLastUpdate() >= UPDATE_INTERVAL_MS;
+        }
+
+        function getTashkentDateKey(date = new Date()) {
+            return new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+        }
+
         function shiftDateKey(dateKey, offsetDays) {
             const [year, month, day] = dateKey.split("-").map(Number);
             const date = new Date(Date.UTC(year, month - 1, day + offsetDays));
@@ -357,7 +556,8 @@
             const raw = event.ts ?? event.timestamp ?? event.time ?? event.date;
             if (!raw) return null;
             let date = (typeof raw === "number" || /^\d{10,13}$/.test(String(raw))) 
-                ? new Date(Number(String(raw).length === 10 ? raw * 1000 : raw)) : new Date(raw);
+                ? new Date(Number(String(raw).length === 10 ? raw * 1000 : raw)) 
+                : new Date(raw);
             return Number.isNaN(date.getTime()) ? null : getTashkentDateKey(date);
         }
 
@@ -373,39 +573,26 @@
             const timestamp = Number(event.ts ?? event.timestamp);
             const rawTime = event.time ?? event.date ?? "";
             const parsedDate = Number.isFinite(timestamp) && timestamp > 0
-                ? new Date(String(timestamp).length === 10 ? timestamp * 1000 : timestamp) : new Date(rawTime);
+                ? new Date(String(timestamp).length === 10 ? timestamp * 1000 : timestamp)
+                : new Date(rawTime);
 
             return {
-                id: String(event.id ?? event.event_id ?? `${event.currency ?? ""}_${event.title ?? ""}_${event.ts ?? index}`),
-                currency: String(event.currency ?? "").toUpperCase(),
-                title: String(event.title ?? event.event ?? "Untitled event"),
-                time: parsedDate, dateKey: getEventDateKey(event),
+                id: String(event.id ?? event.event_id ?? `${event.currency ?? ""}_${event.title ?? event.event ?? ""}_${event.ts ?? index}`),
+                currency: String(event.currency ?? event.country_currency ?? "").toUpperCase(),
+                country: String(event.country ?? event.country_code ?? ""),
+                title: String(event.title ?? event.event ?? event.name ?? "Untitled event"),
+                time: parsedDate,
+                dateKey: getEventDateKey(event),
                 impact: normalizeImpact(event.impact ?? event.impact_level),
-                actual: event.actual ?? null, forecast: event.forecast ?? event.consensus ?? null, previous: event.previous ?? null
+                actual: event.actual ?? null,
+                forecast: event.forecast ?? event.consensus ?? null,
+                previous: event.previous ?? null
             };
         }
 
         function formatTime(date) {
             if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "—";
             return new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
-        }
-
-        // HH:MM va so'z bilan (3h 49m) formatida taymer
-        function getCountdown(targetDate) {
-            if (!(targetDate instanceof Date) || Number.isNaN(targetDate.getTime())) return null;
-            const now = new Date();
-            const diffMs = targetDate.getTime() - now.getTime();
-            const isPast = diffMs < 0;
-            const absMs = Math.abs(diffMs);
-
-            const hours = Math.floor(absMs / (1000 * 60 * 60));
-            const minutes = Math.floor((absMs % (1000 * 60 * 60)) / (1000 * 60));
-            
-            let text = "";
-            if (hours > 0) text += `${hours}h `;
-            text += `${minutes}m`;
-
-            return { text: text.trim(), isPast };
         }
 
         function escapeHTML(value) {
@@ -447,28 +634,10 @@
                 item.addEventListener("click", () => {
                     const code = item.dataset.currency;
                     state.currency = (state.currency === code) ? "all" : code;
-                    renderCurrencyList(); renderEvents();
+                    renderCurrencyList();
+                    renderEvents();
                 });
             });
-        }
-
-        // Yulduzchalarni chizish funksiyasi
-        function renderStars(impact) {
-            let starsHtml = '<div class="ec-card-stars">';
-            const maxStars = 3;
-            let activeCount = 0;
-            let activeClass = "";
-
-            if (impact === "high") { activeCount = 3; activeClass = "active-high"; }
-            else if (impact === "medium") { activeCount = 2; activeClass = "active-medium"; }
-            else if (impact === "low") { activeCount = 1; activeClass = "active-low"; }
-
-            for (let i = 0; i < maxStars; i++) {
-                const isActive = i < activeCount;
-                starsHtml += `<span class="ec-star ${isActive ? activeClass : ''}">★</span>`;
-            }
-            starsHtml += '</div>';
-            return starsHtml;
         }
 
         function renderEvents() {
@@ -477,8 +646,13 @@
 
             elements.count.textContent = `${events.length} ta yangilik`;
             elements.lastUpdated.textContent = state.lastUpdated
-                ? `${new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit" }).format(state.lastUpdated)} da yangilandi`
+                ? `Oxiri: ${new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, dateStyle: "short", timeStyle: "short" }).format(state.lastUpdated)} (Toshkent)`
                 : "Hali yangilanmagan";
+
+            if (state.activeRange === "yesterday") {
+                elements.list.innerHTML = `<div class="ec-empty"><strong>Kecha uchun to'liq ma'lumot mavjud emas</strong><span>API faqat oxirgi 6 soatni beradi.</span></div>`;
+                return;
+            }
 
             if (!events.length) {
                 elements.list.innerHTML = `<div class="ec-empty"><strong>Yangilik topilmadi</strong><span>Tanlangan filtrlarga mos ma'lumot yo'q.</span></div>`;
@@ -488,63 +662,26 @@
             elements.list.innerHTML = events.map(event => {
                 const currData = CURRENCIES.find(c => c.code === event.currency);
                 const flagHtml = currData && currData.flag 
-                    ? `<img src="https://flagcdn.com/w40/${currData.flag}.png" class="ec-card-flag" alt="${event.currency}">` 
-                    : `<div class="ec-card-flag" style="background:#333"></div>`;
-
-                const countdown = getCountdown(event.time);
-                const timerClass = countdown && countdown.isPast ? "past" : "future";
-                const timerText = countdown ? countdown.text : "";
-                
-                // Faqat mavjud ma'lumotlarni ko'rsatish (bo'sh bo'lsa yashirish)
-                let dataHtml = '';
-                if (event.forecast || event.previous) {
-                    dataHtml = `<div class="ec-card-data">`;
-                    if (event.forecast !== null) {
-                        dataHtml += `<div class="ec-data-item"><span class="ec-data-label">Forecast</span><span class="ec-data-value">${escapeHTML(event.forecast)}</span></div>`;
-                    }
-                    if (event.previous !== null) {
-                        dataHtml += `<div class="ec-data-item"><span class="ec-data-label">Previous</span><span class="ec-data-value">${escapeHTML(event.previous)}</span></div>`;
-                    }
-                    dataHtml += `</div>`;
-                }
+                    ? `<img src="https://flagcdn.com/w20/${currData.flag}.png" class="ec-flag" alt="${event.currency}">` 
+                    : "";
 
                 return `
-                <article class="ec-event-card impact-${event.impact}" data-time="${event.time.getTime()}">
-                    <div class="ec-card-time-col">
-                        <div class="ec-card-time">${formatTime(event.time)}</div>
-                        ${countdown ? `<div class="ec-card-timer ${timerClass}">${timerText}</div>` : ''}
-                    </div>
-                    
-                    <div class="ec-card-content">
-                        <div class="ec-card-header">
+                <article class="ec-event">
+                    <div class="ec-event-time">${formatTime(event.time)}</div>
+                    <div class="ec-event-main">
+                        <div class="ec-event-heading">
                             ${flagHtml}
-                            <div class="ec-card-title">${escapeHTML(event.title)}</div>
+                            <span class="ec-currency">${escapeHTML(event.currency || "—")}</span>
+                            <span class="ec-impact ec-impact-${event.impact}">${event.impact === "unknown" ? "Noma'lum" : event.impact.toUpperCase()}</span>
                         </div>
-                        ${renderStars(event.impact)}
-                        ${dataHtml}
+                        <div class="ec-event-title">${escapeHTML(event.title)}</div>
+                        <div class="ec-event-country">${escapeHTML(event.country)}</div>
                     </div>
+                    <div class="ec-event-value"><span class="ec-value-label">Actual</span><strong>${escapeHTML(event.actual ?? "—")}</strong></div>
+                    <div class="ec-event-value"><span class="ec-value-label">Forecast</span><strong>${escapeHTML(event.forecast ?? "—")}</strong></div>
+                    <div class="ec-event-value"><span class="ec-value-label">Previous</span><strong>${escapeHTML(event.previous ?? "—")}</strong></div>
                 </article>`;
             }).join("");
-
-            startTimerUpdates();
-        }
-
-        function startTimerUpdates() {
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                document.querySelectorAll(".ec-event-card").forEach(el => {
-                    const eventTime = Number(el.getAttribute("data-time"));
-                    if (!eventTime) return;
-                    const timerEl = el.querySelector(".ec-card-timer");
-                    if (!timerEl) return;
-
-                    const countdown = getCountdown(new Date(eventTime));
-                    if (countdown) {
-                        timerEl.className = `ec-card-timer ${countdown.isPast ? 'past' : 'future'}`;
-                        timerEl.textContent = countdown.text;
-                    }
-                });
-            }, 60000); 
         }
 
         async function fetchEvents() {
@@ -567,10 +704,12 @@
 
         async function updateCalendar(force = false) {
             if (state.loading) return;
-            if (!navigator.onLine) { return; }
+            if (!navigator.onLine) { setStatus("Internet aloqa yo'q", "offline"); return; }
             
             if (!isRefreshDue(force)) {
                 state.lastUpdated = getLastUpdate() ? new Date(getLastUpdate()) : null;
+                const remainingMinutes = Math.max(1, Math.ceil((getLastUpdate() + UPDATE_INTERVAL_MS - Date.now()) / 60000));
+                setStatus(`Keyingi yangilanish taxminan ${remainingMinutes} daqiqadan so'ng`, "ok");
                 renderEvents();
                 scheduleNextRefresh();
                 return;
@@ -579,11 +718,13 @@
             state.loading = true;
             elements.refresh.disabled = true;
             elements.refresh.textContent = "⏳";
+            setStatus("Yuklanmoqda…", "loading");
 
             try {
                 await fetchEvents();
+                setStatus("Yangilandi · keyingi yangilanish 6 soatdan so'ng", "ok");
             } catch (error) {
-                console.error(error);
+                setStatus("Xatolik yuz berdi", "error");
             } finally {
                 state.loading = false;
                 elements.refresh.disabled = false;
@@ -596,6 +737,12 @@
             if (state.refreshTimer) clearTimeout(state.refreshTimer);
             const remaining = getLastUpdate() + UPDATE_INTERVAL_MS - Date.now();
             if (remaining > 0) state.refreshTimer = setTimeout(() => updateCalendar(), remaining);
+        }
+
+        function setStatus(message, type) {
+            if (!elements.status) return;
+            elements.status.textContent = message;
+            elements.status.dataset.state = type;
         }
 
         function bindControls() {
@@ -628,6 +775,7 @@
             elements.list = document.getElementById("ec-events");
             elements.count = document.getElementById("ec-count");
             elements.lastUpdated = document.getElementById("ec-last-updated");
+            elements.status = document.getElementById("ec-status");
             elements.refresh = document.getElementById("ec-refresh");
             elements.currencyList = document.getElementById("ec-currency-list");
             elements.modalOverlay = document.getElementById("ec-modal-overlay");
@@ -645,9 +793,19 @@
 
             updateCalendar();
             window.addEventListener("online", () => updateCalendar());
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "visible") updateCalendar();
+            });
         }
 
         document.addEventListener("DOMContentLoaded", init);
     </script>
 </body>
 </html>
+```
+
+Nimalar o'zgardi?
+
+1. Filtr tugmasi pastga tushmaydi: Endi .ec-toolbar da flex-wrap: nowrap; qilib qo'yildi. Kunlar (Kecha, Bugun...) va filtr belgisi doim bitta qatorda yonma-yon turadi. Mobil telefonda ham sig'ishi uchun tugmalarning ichki bo'shliqlari (padding) biroz ixchamlashtirildi.
+2. Valyutalar 3 qatorga joylashadi: CSS'dagi .ec-currency-list da grid-template-columns: repeat(3, 1fr); ishlatildi. Bu degani, ekran qanday bo'lishidan qat'i nazar, ro'yxat aniq 3 ta ustunga bo'linadi (9 ta valyuta = 3 qator).
+3. Valyutalar kattalashtirildi: Kartochkalarning ichki bo'shlig'i (padding) oshirildi, bayroqlar (28x20 piksel) va matn (14px) kattaroq va yorqinroq ko'rinishga keltirildi.
