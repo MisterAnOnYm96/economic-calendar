@@ -179,11 +179,28 @@
         .ec-event-time-col {
             width: 20%;
             text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
             padding-top: 12px;
+            gap: 4px;
+        }
+
+        .ec-event-time-val {
             font-variant-numeric: tabular-nums;
             color: var(--ec-muted);
             font-size: 13px;
             font-weight: 700;
+        }
+
+        .ec-countdown {
+            font-size: 9px;
+            color: var(--ec-accent);
+            font-weight: 600;
+            background: rgba(96, 165, 250, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
         }
 
         /* Kartochka qismi */
@@ -338,7 +355,9 @@
             .ec-status { font-size: 12px; min-height: 16px; margin-bottom: 12px; }
             .ec-events-list { gap: 28px; }
             .ec-event-row { gap: 12px; }
-            .ec-event-time-col { font-size: 15px; padding-top: 16px; }
+            .ec-event-time-col { padding-top: 16px; }
+            .ec-event-time-val { font-size: 15px; }
+            .ec-countdown { font-size: 11px; padding: 3px 8px; }
             .ec-event-card { padding: 14px 16px; border-radius: 12px; gap: 10px; }
             .ec-flag { width: 18px; height: 13px; }
             .ec-currency { font-size: 14px; }
@@ -368,7 +387,6 @@
             <div class="ec-range-tabs">
                 <button type="button" data-range="today" class="is-active">Bugun</button>
                 <button type="button" data-range="tomorrow">Ertaga</button>
-                <!-- Bu yerda "Keyingi 7 kun" o'rniga "Haftalik" yozildi -->
                 <button type="button" data-range="7days">Haftalik</button>
             </div>
             <button type="button" id="ec-open-filter" class="ec-filter-btn" title="Filtr">
@@ -504,6 +522,22 @@
             return `${d}/${m}`;
         }
 
+        // Qolgan vaqtni hisoblash funksiyasi
+        function getTimeRemaining(eventTime) {
+            const diff = eventTime - Date.now();
+            if (diff <= 0) return null;
+            
+            const totalMinutes = Math.floor(diff / 60000);
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            
+            if (hours > 0) {
+                return `${hours} h ${minutes} m`;
+            } else {
+                return `${minutes} m`;
+            }
+        }
+
         function escapeHTML(value) {
             return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
         }
@@ -513,7 +547,7 @@
             switch (range) {
                 case "today": return [today, today];
                 case "tomorrow": return [shiftDateKey(today, 1), shiftDateKey(today, 1)];
-                default: return [today, shiftDateKey(today, 7)]; // "7days" uchun
+                default: return [today, shiftDateKey(today, 7)];
             }
         }
 
@@ -569,18 +603,15 @@
             
             let htmlContent = "";
             let lastDateKey = null;
-            let nowDividerInserted = false; // "Hozir" chizig'i faqat bir marta qo'yilishi uchun
+            let nowDividerInserted = false;
 
             events.forEach(event => {
                 const eventTime = event.time instanceof Date ? event.time.getTime() : 0;
-                
-                // O'tib ketganlikni aniqlash (faqat bugungi va vaqti o'tgan bo'lsa)
                 const isPast = (event.dateKey === todayKey) && (eventTime > 0 && eventTime < (now - 60000));
 
-                // 1. Kun o'zgarganini tekshirish va kun badge'ini qo'shish
+                // 1. Kun badge'ini qo'shish
                 if (event.dateKey !== lastDateKey) {
                     lastDateKey = event.dateKey;
-                    
                     htmlContent += `
                     <div class="ec-section-header">
                         <div class="ec-badge is-date">${formatDateBadge(event.dateKey, todayKey, tomorrowKey)}</div>
@@ -588,9 +619,8 @@
                     </div>`;
                 }
 
-                // 2. "Hozir" chizig'ini qo'shish (faqat birinchi marta va faqat o'tib ketmagan yangilik oldidan)
-                if (!isPast && !nowDividerInserted) {
-                    // Agar bu bugungi birinchi yangilik bo'lsa yoki birinchi o'tmagan yangilik bo'lsa, "Hozir" chizig'ini qo'yamiz
+                // 2. "Hozir" chizig'i FAQAT Bugun sahifasida va faqat bir marta chiqadi
+                if (state.activeRange === "today" && !isPast && !nowDividerInserted) {
                     htmlContent += `
                     <div class="ec-section-header" style="margin-top: 12px;">
                         <div class="ec-badge is-time">⬤ Hozir</div>
@@ -611,9 +641,21 @@
 
                 const borderClass = `ec-card-${event.impact}`;
 
+                // Qolgan vaqtni hisoblash (faqat bugungi va kelajakdagi yangiliklar uchun)
+                let countdownHtml = "";
+                if (state.activeRange === "today" && !isPast && eventTime > now) {
+                    const timeLeft = getTimeRemaining(eventTime);
+                    if (timeLeft) {
+                        countdownHtml = `<div class="ec-countdown">${timeLeft}</div>`;
+                    }
+                }
+
                 htmlContent += `
                 <div class="ec-event-row ${isPast ? 'is-past' : ''}">
-                    <div class="ec-event-time-col">${formatTime(event.time)}</div>
+                    <div class="ec-event-time-col">
+                        <div class="ec-event-time-val">${formatTime(event.time)}</div>
+                        ${countdownHtml}
+                    </div>
                     
                     <div class="ec-event-card ${borderClass}">
                         <div class="ec-event-main">
