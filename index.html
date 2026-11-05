@@ -98,23 +98,23 @@
         .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: #f28b82; }
         .ec-status[data-state="ok"] { color: #6fd3a4; }
 
-        /* ================= YANGILIKLAR RO'YXATI (3/4 EKRAN) ================= */
+        /* ================= YANGILIKLAR RO'YXATI (DOIM 3/4) ================= */
         .ec-events-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            width: 75%; /* Ekranning 3/4 qismi */
+            width: 75%; /* Ekranning 3/4 qismi (Har doim) */
             margin-left: auto; /* O'ngga suradi, chapda 1/4 bo'sh qoladi */
         }
 
         .ec-event-card {
             background: var(--ec-panel);
             border: 1px solid var(--ec-border);
-            border-radius: 12px; /* Kichraytirilgan */
-            padding: 12px 14px; /* Ichki bo'shliq kichraytirildi */
+            border-radius: 12px;
+            padding: 12px 14px;
             display: grid;
-            grid-template-columns: 60px minmax(120px, 1fr) 180px; /* Ustunlar ixchamlashtirildi */
-            gap: 12px;
+            grid-template-columns: 55px minmax(100px, 1fr) 160px; /* Yana biroz ixchamlashtirildi */
+            gap: 10px;
             align-items: center;
             border-left: 4px solid var(--ec-border); 
         }
@@ -127,7 +127,7 @@
 
         .ec-event-time {
             font-variant-numeric: tabular-nums;
-            color: var(--ec-muted); font-size: 12px; /* Kichraytirildi */
+            color: var(--ec-muted); font-size: 11px;
         }
 
         .ec-event-heading { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
@@ -137,10 +137,10 @@
             object-fit: cover; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .ec-currency { color: var(--ec-accent); font-weight: 700; font-size: 11px; /* Kichraytirildi */ }
+        .ec-currency { color: var(--ec-accent); font-weight: 700; font-size: 11px; }
 
-        .ec-event-title { font-size: 13px; font-weight: 600; line-height: 1.3; /* Kichraytirildi */ }
-        .ec-event-country { color: var(--ec-muted); font-size: 10px; margin-top: 2px; }
+        .ec-event-title { font-size: 12px; font-weight: 600; line-height: 1.3; }
+        .ec-event-country { color: var(--ec-muted); font-size: 9px; margin-top: 2px; }
 
         /* ================= ACT, FOR, PRE ================= */
         .ec-values-row {
@@ -155,7 +155,7 @@
             align-items: center;
             justify-content: flex-start;
             gap: 2px;
-            padding: 2px 4px; 
+            padding: 2px 2px; 
         }
 
         .ec-value-box + .ec-value-box {
@@ -164,7 +164,7 @@
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 9px; /* Kichraytirildi */
+            font-size: 9px;
             font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1;
@@ -172,7 +172,7 @@
 
         .ec-value-box strong {
             font-weight: 700;
-            font-size: 11px; /* Kichraytirildi */
+            font-size: 11px;
             font-variant-numeric: tabular-nums;
             color: var(--ec-text);
             line-height: 1.2;
@@ -246,30 +246,27 @@
         .ec-currency-item img { width: 28px; height: 20px; border-radius: 3px; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
         .ec-currency-item span { font-weight: 700; font-size: 14px; }
 
-        /* Mobil moslashuv */
+        /* Mobil moslashuv (3/4 qism saqlanib qoladi) */
         @media (max-width: 700px) {
             .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
             
-            .ec-events-list {
-                width: 100%; /* Mobilda to'liq kenglikni egallaydi */
-                margin-left: 0;
-            }
-
+            /* width: 75% va margin-left: auto bu yerda ham o'chirilmadi */
+            
             .ec-event-card {
-                grid-template-columns: 1fr;
-                gap: 8px; padding: 12px; padding-left: 14px;
+                grid-template-columns: 1fr; /* Ustunlarni bitta qilib yig'amiz */
+                gap: 8px; padding: 10px 12px; padding-left: 14px;
                 position: relative;
             }
             .ec-event-time {
-                position: absolute; top: 12px; right: 12px;
-                font-size: 12px; color: var(--ec-accent);
+                position: absolute; top: 10px; right: 10px;
+                font-size: 10px; color: var(--ec-accent);
             }
-            .ec-event-main { padding-right: 45px; }
+            .ec-event-main { padding-right: 35px; }
             
-            .ec-values-row { width: 100%; gap: 0; margin-top: 6px; }
-            .ec-value-box { padding: 4px 4px; }
-            .ec-value-box strong { font-size: 12px; }
-            .ec-value-label { font-size: 10px; }
+            .ec-values-row { width: 100%; gap: 0; margin-top: 4px; }
+            .ec-value-box { padding: 2px 2px; }
+            .ec-value-box strong { font-size: 11px; }
+            .ec-value-label { font-size: 9px; }
             
             .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
             .ec-toolbar { padding: 8px; gap: 8px; }
