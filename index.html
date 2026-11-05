@@ -73,7 +73,7 @@
         .ec-refresh:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
         .ec-refresh:disabled { opacity: .6; cursor: wait; }
 
-        /* ================= STATUS (OXIRGI VA KEYINGI YANGILANISH) ================= */
+        /* ================= STATUS ================= */
         .ec-status-container {
             display: flex;
             flex-direction: column;
@@ -251,7 +251,7 @@
         .ec-event-title { font-size: 14px; font-weight: 600; line-height: 1.3; word-break: break-word; }
         .ec-event-country { color: var(--ec-muted); font-size: 10px; margin-top: 2px; }
 
-        /* ================= ACT, FOR, PRE ================= */
+        /* ================= ACTUAL, FORECAST, PREVIOUS ================= */
         .ec-values-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -265,7 +265,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            gap: 1px;
+            gap: 2px;
             padding: 0 2px; 
         }
 
@@ -275,10 +275,11 @@
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 9px;
+            font-size: 8px; /* Uzunroq so'zlar uchun kichraytirildi */
             font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1;
+            text-transform: uppercase;
         }
 
         .ec-value-box strong {
@@ -380,7 +381,7 @@
             .ec-currency { font-size: 14px; }
             .ec-event-title { font-size: 16px; }
             .ec-event-country { font-size: 11px; }
-            .ec-value-label { font-size: 10px; }
+            .ec-value-label { font-size: 9px; }
             .ec-value-box strong { font-size: 13px; }
             .ec-impact-filter label { padding: 12px; font-size: 13px; }
             .ec-currency-item { padding: 12px 8px; }
@@ -399,7 +400,6 @@
             <button id="ec-refresh" class="ec-refresh" type="button" aria-label="Yangilash" title="Yangilash">↻</button>
         </header>
 
-        <!-- Oxirgi yangilangan vaqt va keyingi yangilanish -->
         <div class="ec-status-container">
             <div class="ec-status-row" id="ec-last-updated-row">
                 <span class="ec-status-text">Oxirgi yangilangan vaqt</span>
@@ -441,13 +441,14 @@
             </div>
             
             <div class="ec-impact-filter" aria-label="Impact filtri">
+                <!-- Standart: faqat High belgilangan -->
                 <label><input type="checkbox" data-impact value="high" checked><i class="dot high"></i> High</label>
-                <label><input type="checkbox" data-impact value="medium" checked><i class="dot medium"></i> Medium</label>
-                <label><input type="checkbox" data-impact value="low" checked><i class="dot low"></i> Low</label>
+                <label><input type="checkbox" data-impact value="medium"><i class="dot medium"></i> Medium</label>
+                <label><input type="checkbox" data-impact value="low"><i class="dot low"></i> Low</label>
             </div>
 
             <div class="ec-currency-list" id="ec-currency-list">
-                <!-- JS orqali to'ldiriladi -->
+                <!-- JS orqali to'ldiriladi (USD standart belgilangan bo'ladi) -->
             </div>
         </div>
     </div>
@@ -466,12 +467,14 @@
             { code: "CNY", flag: "cn" }
         ];
 
+        // Standart holatda impacts faqat "high", currencies faqat "USD"
         const state = {
             events: [], lastUpdated: null, loading: false,
             activeRange: "today",
-            impacts: new Set(["high", "medium", "low"]),
-            currencies: new Set(), refreshTimer: null,
-            statusInterval: null // Status vaqtini yangilash uchun interval
+            impacts: new Set(["high"]), 
+            currencies: new Set(["USD"]), 
+            refreshTimer: null,
+            statusInterval: null
         };
 
         const elements = {};
@@ -663,6 +666,7 @@
                     }
                 }
 
+                // ACT, FOR, PRE o'rniga to'liq yozildi
                 htmlContent += `
                 <div class="ec-event-row ${isPast ? 'is-past' : ''}">
                     <div class="ec-event-time-col">
@@ -682,15 +686,15 @@
                         
                         <div class="ec-values-row">
                             <div class="ec-value-box">
-                                <span class="ec-value-label">ACT</span>
+                                <span class="ec-value-label">Actual</span>
                                 <strong>${escapeHTML(valAct)}</strong>
                             </div>
                             <div class="ec-value-box">
-                                <span class="ec-value-label">FOR</span>
+                                <span class="ec-value-label">Forecast</span>
                                 <strong>${escapeHTML(valFor)}</strong>
                             </div>
                             <div class="ec-value-box">
-                                <span class="ec-value-label">PRE</span>
+                                <span class="ec-value-label">Previous</span>
                                 <strong>${escapeHTML(valPre)}</strong>
                             </div>
                         </div>
@@ -704,7 +708,6 @@
         function updateStatusUI() {
             const last = getLastUpdate();
             
-            // 1. Oxirgi yangilangan vaqtni formatlash (hh:mm dd.mm.yy)
             if (last) {
                 const d = new Date(last);
                 const pad = (n) => String(n).padStart(2, "0");
@@ -714,7 +717,6 @@
                 elements.lastUpdatedVal.textContent = "—";
             }
 
-            // 2. Keyingi yangilanish vaqtini hisoblash
             if (!last) {
                 elements.statusText.textContent = "Kalendar tayyorlanmoqda…";
                 elements.statusTime.textContent = "";
@@ -805,7 +807,6 @@
             if (remaining > 0) {
                 state.refreshTimer = setTimeout(() => updateCalendar(), remaining);
             }
-            // Har daqiqada status vaqtini yangilab turish
             if (!state.statusInterval) {
                 state.statusInterval = setInterval(updateStatusUI, 60000);
             }
@@ -845,7 +846,6 @@
             elements.openFilterBtn = document.getElementById("ec-open-filter");
             elements.closeFilterBtn = document.getElementById("ec-close-filter");
             
-            // Status elementlari
             elements.lastUpdatedVal = document.getElementById("ec-last-updated-val");
             elements.statusRow = document.getElementById("ec-status-row");
             elements.statusText = document.getElementById("ec-status-text");
