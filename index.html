@@ -24,9 +24,6 @@
             --ec-medium-text: #f5c36b;
             --ec-low-bg: #173e32;
             --ec-low-text: #65d6a0;
-            
-            /* Yangi qizil chegara rangi */
-            --ec-card-border-left: #f05252; 
         }
 
         body {
@@ -111,15 +108,21 @@
         .ec-event-card {
             background: var(--ec-panel);
             border: 1px solid var(--ec-border);
-            /* Chap tomonga qalinroq qizil chiziq qo'shildi */
-            border-left: 4px solid var(--ec-card-border-left);
             border-radius: 14px;
             padding: 16px;
             display: grid;
             grid-template-columns: 76px minmax(150px, 1fr) 200px;
             gap: 16px;
             align-items: center;
+            /* Standart holatda chap chegara (neytral) */
+            border-left: 4px solid var(--ec-border); 
         }
+
+        /* Impact darajasiga qarab chegarani ranglash */
+        .ec-card-high { border-left-color: var(--ec-high-text) !important; }
+        .ec-card-medium { border-left-color: var(--ec-medium-text) !important; }
+        .ec-card-low { border-left-color: var(--ec-low-text) !important; }
+        .ec-card-unknown { border-left-color: var(--ec-muted) !important; }
 
         .ec-event-time {
             font-variant-numeric: tabular-nums;
@@ -134,15 +137,6 @@
         }
 
         .ec-currency { color: var(--ec-accent); font-weight: 700; font-size: 12px; }
-
-        .ec-impact {
-            border-radius: 5px; padding: 3px 5px;
-            font-size: 9px; font-weight: 800;
-        }
-        .ec-impact-high { color: var(--ec-high-text); background: var(--ec-high-bg); }
-        .ec-impact-medium { color: var(--ec-medium-text); background: var(--ec-medium-bg); }
-        .ec-impact-low { color: var(--ec-low-text); background: var(--ec-low-bg); }
-        .ec-impact-unknown { color: var(--ec-muted); background: var(--ec-panel-2); }
 
         .ec-event-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
         .ec-event-country { color: var(--ec-muted); font-size: 11px; margin-top: 4px; }
@@ -257,7 +251,7 @@
             
             .ec-event-card {
                 grid-template-columns: 1fr;
-                gap: 10px; padding: 13px 11px; padding-left: 14px; /* Qizil chiziq uchun chapdan joy */
+                gap: 10px; padding: 13px 11px; padding-left: 14px;
                 position: relative;
             }
             .ec-event-time {
@@ -495,14 +489,17 @@
                 const valFor = (event.forecast === null || event.forecast === undefined || event.forecast === "") ? "—" : event.forecast;
                 const valPre = (event.previous === null || event.previous === undefined || event.previous === "") ? "—" : event.previous;
 
+                // Kartochkaning chap chegarasi rangini aniqlash uchun dinamik klass
+                const borderClass = `ec-card-${event.impact}`;
+
                 return `
-                <div class="ec-event-card">
+                <div class="ec-event-card ${borderClass}">
                     <div class="ec-event-time">${formatTime(event.time)}</div>
                     <div class="ec-event-main">
                         <div class="ec-event-heading">
                             ${flagHtml}
                             <span class="ec-currency">${escapeHTML(event.currency || "—")}</span>
-                            <span class="ec-impact ec-impact-${event.impact}">${event.impact === "unknown" ? "Noma'lum" : event.impact.toUpperCase()}</span>
+                            <!-- HIGH/MEDIUM/LOW yozuvlari olib tashlandi -->
                         </div>
                         <div class="ec-event-title">${escapeHTML(event.title)}</div>
                         <div class="ec-event-country">${escapeHTML(event.country)}</div>
