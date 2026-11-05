@@ -368,6 +368,7 @@
             <div class="ec-range-tabs">
                 <button type="button" data-range="today" class="is-active">Bugun</button>
                 <button type="button" data-range="tomorrow">Ertaga</button>
+                <!-- Bu yerda "Keyingi 7 kun" o'rniga "Haftalik" yozildi -->
                 <button type="button" data-range="7days">Haftalik</button>
             </div>
             <button type="button" id="ec-open-filter" class="ec-filter-btn" title="Filtr">
@@ -512,7 +513,7 @@
             switch (range) {
                 case "today": return [today, today];
                 case "tomorrow": return [shiftDateKey(today, 1), shiftDateKey(today, 1)];
-                default: return [today, shiftDateKey(today, 7)];
+                default: return [today, shiftDateKey(today, 7)]; // "7days" uchun
             }
         }
 
@@ -568,15 +569,15 @@
             
             let htmlContent = "";
             let lastDateKey = null;
-            let currentTimeDividerInserted = false;
+            let nowDividerInserted = false; // "Hozir" chizig'i faqat bir marta qo'yilishi uchun
 
             events.forEach(event => {
                 const eventTime = event.time instanceof Date ? event.time.getTime() : 0;
                 
-                // Qat'iy mantiq: Faqat bugungi va vaqti o'tgan bo'lsa "o'tib ketgan"
+                // O'tib ketganlikni aniqlash (faqat bugungi va vaqti o'tgan bo'lsa)
                 const isPast = (event.dateKey === todayKey) && (eventTime > 0 && eventTime < (now - 60000));
 
-                // 1. Kun badge'ini qo'shish
+                // 1. Kun o'zgarganini tekshirish va kun badge'ini qo'shish
                 if (event.dateKey !== lastDateKey) {
                     lastDateKey = event.dateKey;
                     
@@ -585,31 +586,17 @@
                         <div class="ec-badge is-date">${formatDateBadge(event.dateKey, todayKey, tomorrowKey)}</div>
                         <div class="ec-section-line"></div>
                     </div>`;
-
-                    // Agar bugun bo'lsa va hali "Hozir" chizig'i qo'yilmagan bo'lsa
-                    // va bu kunning birinchi yangiligi bo'lsa, demak bugungi hamma narsa o'tib ketgan yoki hali boshlanmagan.
-                    if (event.dateKey === todayKey && !currentTimeDividerInserted) {
-                        // Agar bu birinchi yangilikning vaqti o'tgan bo'lsa, demak hozirgi vaqt keyinroq keladi
-                        // Agar bu birinchi yangilikning vaqti kelajakda bo'lsa, demak biz hozirgi vaqtga yetib keldik
-                        if (!isPast) {
-                            htmlContent += `
-                            <div class="ec-section-header" style="margin-top: 12px;">
-                                <div class="ec-badge is-time">⬤ Hozir</div>
-                                <div class="ec-section-line"></div>
-                            </div>`;
-                            currentTimeDividerInserted = true;
-                        }
-                    }
                 }
 
-                // 2. "Hozir" chizig'ini qo'shish (agar kun o'zgarmagan bo'lsa-yu, lekin birinchi marta o'tmagan yangilikka yetilsa)
-                if (event.dateKey === todayKey && !isPast && !currentTimeDividerInserted) {
+                // 2. "Hozir" chizig'ini qo'shish (faqat birinchi marta va faqat o'tib ketmagan yangilik oldidan)
+                if (!isPast && !nowDividerInserted) {
+                    // Agar bu bugungi birinchi yangilik bo'lsa yoki birinchi o'tmagan yangilik bo'lsa, "Hozir" chizig'ini qo'yamiz
                     htmlContent += `
                     <div class="ec-section-header" style="margin-top: 12px;">
                         <div class="ec-badge is-time">⬤ Hozir</div>
                         <div class="ec-section-line"></div>
                     </div>`;
-                    currentTimeDividerInserted = true;
+                    nowDividerInserted = true;
                 }
 
                 // 3. Yangilikni render qilish
