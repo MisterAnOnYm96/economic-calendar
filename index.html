@@ -106,7 +106,7 @@
         /* ================= JADVAL VA EVENTLAR ================= */
         .ec-table-head, .ec-event {
             display: grid;
-            grid-template-columns: 76px minmax(150px, 1fr) 210px; /* O'ng ustun biroz kengaytirildi */
+            grid-template-columns: 76px minmax(150px, 1fr) 210px;
             gap: 14px;
             align-items: center;
         }
@@ -147,7 +147,7 @@
         .ec-event-title { font-size: 13px; font-weight: 600; line-height: 1.4; }
         .ec-event-country { color: var(--ec-muted); font-size: 10px; margin-top: 4px; }
 
-        /* ================= ACT, FOR, PRE - ALOHIDA KATAKLAR ================= */
+        /* ================= ACT, FOR, PRE KATAKCHALARI (TO'G'RILANDI) ================= */
         .ec-values-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -158,29 +158,31 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Tepadagi yozuv doim tepada turadi */
             gap: 4px;
             background: var(--ec-panel-2);
             border: 1px solid var(--ec-border);
             border-radius: 8px;
-            padding: 8px 4px;
-            min-height: 52px; /* Balandlikni tenglashtirish uchun */
+            padding: 6px 4px; /* Ichki bo'shliq kichraytirildi */
+            min-height: 54px; /* Balandlik qat'iy belgilandi */
         }
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 10px;
+            font-size: 9px; /* Nom shrifti kichraytirildi */
             font-weight: 800;
             letter-spacing: 0.5px;
+            line-height: 1;
         }
 
         .ec-value-box strong {
             font-weight: 700;
-            font-size: 14px; /* O'lcham kattalashtirildi */
+            font-size: 12px; /* Qiymat shrifti kichraytirildi */
             font-variant-numeric: tabular-nums;
             color: var(--ec-text);
             line-height: 1.2;
             text-align: center;
+            margin-top: auto; /* Qiymatni pastga tortadi, shunda nom doim tepada qoladi */
         }
 
         .ec-empty {
@@ -255,7 +257,7 @@
             .ec-table-head { display: none; }
             
             .ec-event {
-                grid-template-columns: 1fr; /* Hammasini bitta ustunga */
+                grid-template-columns: 1fr;
                 gap: 10px; padding: 13px 11px; position: relative;
             }
             .ec-event-time {
@@ -264,12 +266,9 @@
             }
             .ec-event-main { padding-right: 50px; }
             
-            .ec-values-row {
-                width: 100%;
-                gap: 8px;
-            }
-            .ec-value-box { padding: 10px 4px; }
-            .ec-value-box strong { font-size: 15px; }
+            .ec-values-row { width: 100%; gap: 8px; }
+            .ec-value-box { padding: 8px 4px; min-height: 56px; }
+            .ec-value-box strong { font-size: 13px; }
             
             .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
             .ec-toolbar { padding: 8px; gap: 8px; }
@@ -497,6 +496,11 @@
                     ? `<img src="https://flagcdn.com/w20/${currData.flag}.png" class="ec-flag" alt="${event.currency}">` 
                     : "";
 
+                // NULL yoki bo'sh bo'lganda "—" chiqarish mantiqi
+                const valAct = (event.actual === null || event.actual === undefined || event.actual === "") ? "—" : event.actual;
+                const valFor = (event.forecast === null || event.forecast === undefined || event.forecast === "") ? "—" : event.forecast;
+                const valPre = (event.previous === null || event.previous === undefined || event.previous === "") ? "—" : event.previous;
+
                 return `
                 <article class="ec-event">
                     <div class="ec-event-time">${formatTime(event.time)}</div>
@@ -513,15 +517,15 @@
                     <div class="ec-values-row">
                         <div class="ec-value-box">
                             <span class="ec-value-label">ACT</span>
-                            <strong>${escapeHTML(event.actual ?? "—")}</strong>
+                            <strong>${escapeHTML(valAct)}</strong>
                         </div>
                         <div class="ec-value-box">
                             <span class="ec-value-label">FOR</span>
-                            <strong>${escapeHTML(event.forecast ?? "—")}</strong>
+                            <strong>${escapeHTML(valFor)}</strong>
                         </div>
                         <div class="ec-value-box">
                             <span class="ec-value-label">PRE</span>
-                            <strong>${escapeHTML(event.previous ?? "—")}</strong>
+                            <strong>${escapeHTML(valPre)}</strong>
                         </div>
                     </div>
                 </article>`;
