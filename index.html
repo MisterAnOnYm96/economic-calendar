@@ -1,8 +1,3 @@
-Tushundim, valyutalarni kattaroq qilib, aniq 3 qatorga joylashtiramiz. Va asosiy ekrandagi filtr belgisini pastga tushib qolmasligi uchun kunlar (Kecha, Bugun...) bilan bir qatorga, o'ng chetiga mahkamlaymiz.
-
-Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi index.html faylingizga nusxalab qo'ying:
-
-```html
 <!doctype html>
 <html lang="uz">
 <head>
@@ -22,6 +17,13 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             --ec-text: #e8eef7;
             --ec-muted: #91a0b6;
             --ec-accent: #60a5fa;
+            
+            --ec-high-bg: #4b252e;
+            --ec-high-text: #ff8d8d;
+            --ec-medium-bg: #49391f;
+            --ec-medium-text: #f5c36b;
+            --ec-low-bg: #173e32;
+            --ec-low-text: #65d6a0;
         }
 
         body {
@@ -82,12 +84,11 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
         .ec-refresh:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
         .ec-refresh:disabled { opacity: .6; cursor: wait; }
 
-        /* Kunlar va Filtr tugmasi bir qatorda turishi uchun tuzatildi */
         .ec-toolbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: nowrap; /* Pastga tushishni oldini oladi */
+            flex-wrap: nowrap;
             gap: 10px;
             background: var(--ec-panel);
             border: 1px solid var(--ec-border);
@@ -110,7 +111,7 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             color: var(--ec-muted);
             cursor: pointer;
             font-size: 13px;
-            white-space: nowrap; /* Matn buzilib tushmasligi uchun */
+            white-space: nowrap;
         }
 
         .ec-range-tabs button.is-active {
@@ -119,7 +120,6 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             color: #fff;
         }
 
-        /* Filtr tugmasi ixcham va o'ngga mahkamlangan */
         .ec-filter-btn {
             border: 1px solid var(--ec-border);
             border-radius: 8px;
@@ -131,7 +131,7 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            flex-shrink: 0; /* Siqilib qolmasligi uchun */
+            flex-shrink: 0;
         }
 
         .ec-filter-btn:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
@@ -217,9 +217,9 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             font-weight: 800;
         }
 
-        .ec-impact-high { color: #ff8d8d; background: #4b252e; }
-        .ec-impact-medium { color: #f5c36b; background: #49391f; }
-        .ec-impact-low { color: #65d6a0; background: #173e32; }
+        .ec-impact-high { color: var(--ec-high-text); background: var(--ec-high-bg); }
+        .ec-impact-medium { color: var(--ec-medium-text); background: var(--ec-medium-bg); }
+        .ec-impact-low { color: var(--ec-low-text); background: var(--ec-low-bg); }
         .ec-impact-unknown { color: var(--ec-muted); background: var(--ec-panel-2); }
 
         .ec-event-title {
@@ -318,6 +318,7 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             padding: 0;
         }
 
+        /* ================= IMPACT FILTER (HIGH/MEDIUM/LOW) ================= */
         .ec-impact-filter {
             display: flex;
             gap: 10px;
@@ -337,16 +338,29 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             color: var(--ec-muted);
             font-size: 13px;
             cursor: pointer;
-            border: 1px solid transparent;
+            border: 1px solid var(--ec-border);
             transition: all 0.2s;
-        }
-        
-        .ec-impact-filter label:has(input:checked) {
-            border-color: var(--ec-border);
-            color: var(--ec-text);
+            font-weight: 600;
         }
 
         .ec-impact-filter input { display: none; }
+
+        /* Ranglar faqat input checked bo'lganda o'zgaradi */
+        .ec-impact-filter label:has(input[value="high"]:checked) {
+            background: var(--ec-high-bg);
+            color: var(--ec-high-text);
+            border-color: var(--ec-high-text);
+        }
+        .ec-impact-filter label:has(input[value="medium"]:checked) {
+            background: var(--ec-medium-bg);
+            color: var(--ec-medium-text);
+            border-color: var(--ec-medium-text);
+        }
+        .ec-impact-filter label:has(input[value="low"]:checked) {
+            background: var(--ec-low-bg);
+            color: var(--ec-low-text);
+            border-color: var(--ec-low-text);
+        }
 
         .dot {
             width: 8px;
@@ -354,15 +368,21 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             display: inline-block;
             border-radius: 50%;
         }
-        .dot.high { background: #f05252; }
-        .dot.medium { background: #e9a23b; }
-        .dot.low { background: #35b779; }
+        /* Aktiv bo'lmaganda rangli doiralar turadi */
+        .dot.high { background: var(--ec-high-text); }
+        .dot.medium { background: var(--ec-medium-text); }
+        .dot.low { background: var(--ec-low-text); }
+        
+        /* Aktiv bo'lganda doira oq rangga o'tadi (chiroyli ko'rinish uchun) */
+        .ec-impact-filter label:has(input:checked) .dot {
+            background: currentColor;
+        }
 
-        /* ================= VALYUTALAR (Aynan 3 QATORGA MOSLASHTIRILDI) ================= */
+        /* ================= VALYUTALAR (MULTI-SELECT) ================= */
         .ec-currency-list {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 ta ustun */
-            gap: 10px; /* Kartochkalar orasidagi masofa */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             padding-bottom: 20px;
         }
 
@@ -372,7 +392,7 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             justify-content: center;
             gap: 8px;
             background: var(--ec-panel-2);
-            padding: 14px 10px; /* Kattaroq qilindi */
+            padding: 14px 10px;
             border-radius: 10px;
             cursor: pointer;
             border: 1px solid transparent;
@@ -385,7 +405,7 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
         }
 
         .ec-currency-item img {
-            width: 28px; /* Bayroq kattalashtirildi */
+            width: 28px;
             height: 20px;
             border-radius: 3px;
             object-fit: cover;
@@ -394,10 +414,9 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
 
         .ec-currency-item span {
             font-weight: 700;
-            font-size: 14px; /* Matn kattalashtirildi */
+            font-size: 14px;
         }
 
-        /* Mobil moslashuv */
         @media (max-width: 700px) {
             .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
             .ec-table-head { display: none; }
@@ -429,8 +448,6 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             .ec-event-value .ec-value-label { margin-top: 0; font-size: 9px; }
             .ec-event-value strong { font-size: 11px; }
             .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
-            
-            /* Mobil telefonda ham kunlar va filtr yonma-yon turishi uchun */
             .ec-toolbar { padding: 8px; gap: 8px; }
             .ec-range-tabs button { padding: 8px; font-size: 12px; }
         }
@@ -527,7 +544,7 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             loading: false,
             activeRange: "7days",
             impacts: new Set(["high", "medium", "low"]),
-            currency: "all",
+            currencies: new Set(), // Endi bu Set bo'ldi (bir nechta tanlash uchun)
             refreshTimer: null
         };
 
@@ -614,14 +631,16 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             return state.events
                 .filter(event => event.dateKey && event.dateKey >= from && event.dateKey <= to)
                 .filter(event => state.impacts.has(event.impact))
-                .filter(event => state.currency === "all" || event.currency === state.currency)
+                // Agar state.currencies bo'sh bo'lsa (hech narsa tanlanmagan bo'lsa), hammasini ko'rsatamiz. 
+                // Aks holda faqat tanlangan valyutalarni chiqaramiz.
+                .filter(event => state.currencies.size === 0 || state.currencies.has(event.currency))
                 .sort((a, b) => (a.time?.getTime() || 0) - (b.time?.getTime() || 0));
         }
 
         function renderCurrencyList() {
             if (!elements.currencyList) return;
             elements.currencyList.innerHTML = CURRENCIES.map(curr => {
-                const isActive = (state.currency === curr.code);
+                const isActive = state.currencies.has(curr.code);
                 return `
                     <div class="ec-currency-item ${isActive ? 'is-active' : ''}" data-currency="${curr.code}">
                         <img src="https://flagcdn.com/w40/${curr.flag}.png" alt="${curr.code}">
@@ -633,7 +652,12 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
             elements.currencyList.querySelectorAll(".ec-currency-item").forEach(item => {
                 item.addEventListener("click", () => {
                     const code = item.dataset.currency;
-                    state.currency = (state.currency === code) ? "all" : code;
+                    // Multi-select mantiqi: agar bor bo'lsa o'chiramiz, yo'q bo'lsa qo'shamiz
+                    if (state.currencies.has(code)) {
+                        state.currencies.delete(code);
+                    } else {
+                        state.currencies.add(code);
+                    }
                     renderCurrencyList();
                     renderEvents();
                 });
@@ -802,10 +826,3 @@ Buning uchun CSS qismiga kichik o'zgarishlar kiritdik. Kodni to'liq GitHub'dagi 
     </script>
 </body>
 </html>
-```
-
-Nimalar o'zgardi?
-
-1. Filtr tugmasi pastga tushmaydi: Endi .ec-toolbar da flex-wrap: nowrap; qilib qo'yildi. Kunlar (Kecha, Bugun...) va filtr belgisi doim bitta qatorda yonma-yon turadi. Mobil telefonda ham sig'ishi uchun tugmalarning ichki bo'shliqlari (padding) biroz ixchamlashtirildi.
-2. Valyutalar 3 qatorga joylashadi: CSS'dagi .ec-currency-list da grid-template-columns: repeat(3, 1fr); ishlatildi. Bu degani, ekran qanday bo'lishidan qat'i nazar, ro'yxat aniq 3 ta ustunga bo'linadi (9 ta valyuta = 3 qator).
-3. Valyutalar kattalashtirildi: Kartochkalarning ichki bo'shlig'i (padding) oshirildi, bayroqlar (28x20 piksel) va matn (14px) kattaroq va yorqinroq ko'rinishga keltirildi.
