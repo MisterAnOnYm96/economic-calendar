@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="uz">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101827">
+    <title>Economic Calendar</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        :root {
+            color-scheme: dark;
+            --ec-bg: #0b1220;
+            --ec-panel: #111c2e;
+            --ec-panel-2: #172338;
+            --ec-border: #26364e;
+            --ec-text: #e8eef7;
+            --ec-muted: #91a0b6;
+            --ec-accent: #60a5fa;
+        }
+
+        body {
+            margin: 0;
+            background: var(--ec-bg);
+            color: var(--ec-text);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            overflow-x: hidden;
+        }
+
+        .ec-page {
+            width: min(1200px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 28px 0 40px;
+        }
+
+        .ec-header {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .ec-title-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .ec-header h1 {
+            margin: 0;
+            font-size: clamp(25px, 4vw, 34px);
+        }
+
+        .ec-subtitle, .ec-footer {
+            color: var(--ec-muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* Yangilash tugmasi Rounded Square shaklida */
+        .ec-refresh {
+            border: 1px solid var(--ec-border);
+            border-radius: 12px;
+            background: var(--ec-panel-2);
+            color: var(--ec-text);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .ec-refresh:hover {
+            border-color: var(--ec-accent);
+            color: var(--ec-accent);
+        }
+
+        .ec-refresh:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        .ec-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: var(--ec-panel);
+            border: 1px solid var(--ec-border);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .ec-range-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .ec-range-tabs button {
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 9px 12px;
+            background: transparent;
+            color: var(--ec-muted);
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .ec-range-tabs button.is-active {
+            background: #1d3b60;
+            border-color: #315d8c;
+            color: #fff;
+        }
+
+        /* Filtr tugmasi (Funnel icon) */
+        .ec-filter-btn {
+            border: 1px solid var(--ec-border);
+            border-radius: 8px;
+            background: var(--ec-panel-2);
+            color: var(--ec-text);
+            padding: 9px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .ec-filter-btn:hover {
+            border-color: var(--ec-accent);
+        }
+
+        .ec-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--ec-muted);
+            font-size: 12px;
+            margin: 0 2px 10px;
+        }
+
+        .ec-status {
+            margin-bottom: 12px;
+            color: var(--ec-muted);
+            font-size: 12px;
+            min-height: 16px;
+        }
+
+        .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: #f28b82; }
+        .ec-status[data-state="ok"] { color: #6fd3a4; }
+
+        .ec-table-wrap {
+            overflow: hidden;
+            border: 1px solid var(--ec-border);
+            border-radius: 14px;
+            background: var(--ec-panel);
+        }
+
+        .ec-table-head, .ec-event {
+            display: grid;
+            grid-template-columns: 76px minmax(190px, 1.8fr) repeat(3, minmax(85px, .7fr));
+            gap: 14px;
+            align-items: center;
+        }
+
+        .ec-table-head {
+            padding: 13px 16px;
+            background: var(--ec-panel-2);
+            color: var(--ec-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .ec-event {
+            padding: 15px 16px;
+            border-top: 1px solid var(--ec-border);
+        }
+
+        .ec-event-time {
+            font-variant-numeric: tabular-nums;
+            color: var(--ec-muted);
+            font-size: 13px;
+        }
+
+        .ec-event-heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .ec-flag {
+            width: 18px;
+            height: 13px;
+            border-radius: 2px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .ec-currency {
+            color: var(--ec-accent);
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .ec-impact {
+            border-radius: 5px;
+            padding: 3px 5px;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .ec-impact-high { color: #ff8d8d; background: #4b252e; }
+        .ec-impact-medium { color: #f5c36b; background: #49391f; }
+        .ec-impact-low { color: #65d6a0; background: #173e32; }
+        .ec-impact-unknown { color: var(--ec-muted); background: var(--ec-panel-2); }
+
+        .ec-event-title {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .ec-event-country, .ec-value-label {
+            color: var(--ec-muted);
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .ec-event-value {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .ec-event-value strong {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ec-empty {
+            display: flex;
+            min-height: 180px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--ec-muted);
+            text-align: center;
+            padding: 24px;
+        }
+
+        .ec-empty strong { color: var(--ec-text); }
+        .ec-empty span { font-size: 12px; }
+
+        .ec-footer {
+            padding: 18px 2px;
+            text-align: center;
+        }
+
+        /* ================= MODAL (PASTDAN CHIQADIGAN OYNA) ================= */
+        .ec-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .ec-modal-overlay.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .ec-modal {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--ec-panel);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px;
+            z-index: 1001;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 50vh; /* Telefonning yarmini egallaydi */
+            overflow-y: auto;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+        }
+
+        .ec-modal-overlay.is-open .ec-modal {
+            transform: translateY(0);
+        }
+
+        .ec-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--ec-border);
+        }
+
+        .ec-modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .ec-modal-close {
+            background: transparent;
+            border: none;
+            color: var(--ec-muted);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* Darajalar to'liq qatorni egallaydi (Full width flex) */
+        .ec-impact-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .ec-impact-filter label {
+            flex: 1; /* To'liq qatorga teng taqsimlanadi */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--ec-panel-2);
+            padding: 12px;
+            border-radius: 10px;
+            color: var(--ec-muted);
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .ec-impact-filter label:has(input:checked) {
+            border-color: var(--ec-border);
+            color: var(--ec-text);
+        }
+
+        .ec-impact-filter input {
+            display: none; /* Standart checkboxni yashirish */
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            display: inline-block;
+            border-radius: 50%;
+        }
+        .dot.high { background: #f05252; }
+        .dot.medium { background: #e9a23b; }
+        .dot.low { background: #35b779; }
+
+        /* Valyutalar (Davlat bayrog'i va nomi) */
+        .ec-currency-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            padding-bottom: 20px;
+        }
+
+        .ec-currency-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background: var(--ec-panel-2);
+            padding: 12px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .ec-currency-item:hover, .ec-currency-item.is-active {
+            border-color: var(--ec-accent);
+            background: #1d3b60;
+        }
+
+        .ec-currency-item img {
+            width: 32px;
+            height: 24px;
+            border-radius: 3px;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .ec-currency-item span {
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .ec-currency-item small {
+            color: var(--ec-muted);
+            font-size: 10px;
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        /* Mobil moslashuv */
+        @media (max-width: 700px) {
+            .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
+            .ec-table-head { display: none; }
+            .ec-event {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 13px 11px;
+                position: relative;
+            }
+            .ec-event-time {
+                position: absolute;
+                top: 13px;
+                right: 11px;
+                font-size: 12px;
+                color: var(--ec-accent);
+            }
+            .ec-event-main { padding-right: 50px; }
+            .ec-event-value {
+                display: inline-flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 5px;
+                background: var(--ec-panel-2);
+                padding: 4px 8px;
+                border-radius: 6px;
+                margin-top: 4px;
+                margin-right: 5px;
+            }
+            .ec-event-value .ec-value-label { margin-top: 0; font-size: 9px; }
+            .ec-event-value strong { font-size: 11px; }
+            .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="ec-page">
+        <header class="ec-header">
+            <div class="ec-title-wrap">
+                <h1>Economic Calendar</h1>
+                <p class="ec-subtitle">Global iqtisodiy yangiliklar · Toshkent vaqti (UTC+5)</p>
+            </div>
+            <button id="ec-refresh" class="ec-refresh" type="button" aria-label="Yangilash" title="Yangilash">↻</button>
+        </header>
+
+        <section class="ec-toolbar" aria-label="Sana va filtrlar">
+            <div class="ec-range-tabs">
+                <button type="button" data-range="yesterday">Kecha</button>
+                <button type="button" data-range="today">Bugun</button>
+                <button type="button" data-range="tomorrow">Ertaga</button>
+                <button type="button" data-range="7days" class="is-active">Keyingi 7 kun</button>
+            </div>
+            <!-- Filtr tugmasi -->
+            <button type="button" id="ec-open-filter" class="ec-filter-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filtr
+            </button>
+        </section>
+
+        <section class="ec-meta">
+            <span id="ec-count">0 ta yangilik</span>
+            <span id="ec-last-updated">Hali yangilanmagan</span>
+        </section>
+        <div id="ec-status" class="ec-status" role="status" aria-live="polite">Kalendar tayyorlanmoqda…</div>
+
+        <section class="ec-table-wrap" aria-label="Iqtisodiy yangiliklar">
+            <div class="ec-table-head">
+                <span>Vaqt</span>
+                <span>Yangilik</span>
+                <span>Actual</span>
+                <span>Forecast</span>
+                <span>Previous</span>
+            </div>
+            <div id="ec-events" class="ec-events">
+                <div class="ec-empty">
+                    <strong>Ma'lumot yuklanmoqda…</strong>
+                </div>
+            </div>
+        </section>
+
+        <footer class="ec-footer">
+            Manba: ShowMyTrades · Avtomatik yangilanish: 6 soatda bir marta.
+        </footer>
+    </main>
+
+    <!-- ================= PASTDAN CHIQADIGAN FILTR OYNASI (MODAL) ================= -->
+    <div class="ec-modal-overlay" id="ec-modal-overlay">
+        <div class="ec-modal">
+            <div class="ec-modal-header">
+                <h2>Filtrlash</h2>
+                <button class="ec-modal-close" id="ec-close-filter">&times;</button>
+            </div>
+            
+            <!-- Darajalar to'liq qatorni egallaydi -->
+            <div class="ec-impact-filter" aria-label="Impact filtri">
+                <label><input type="checkbox" data-impact value="high" checked><i class="dot high"></i> High</label>
+                <label><input type="checkbox" data-impact value="medium" checked><i class="dot medium"></i> Medium</label>
+                <label><input type="checkbox" data-impact value="low" checked><i class="dot low"></i> Low</label>
+            </div>
+
+            <!-- Valyutalar va Davlat bayroqlari -->
+            <div class="ec-currency-list" id="ec-currency-list">
+                <!-- JS orqali to'ldiriladi -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const API_URL = "https://showmytrades.com/api/public/calendar/v1";
+        const UPDATE_INTERVAL_MS = 6 * 60 * 60 * 1000;
+        const LAST_UPDATE_KEY = "economic_calendar_last_update";
+        const TIME_ZONE = "Asia/Tashkent";
+
+        // Valyutalar ro'yxati (Bayroq va nomlar bilan)
+        const CURRENCIES = [
+            { code: "ALL", name: "Barchasi", flag: "" },
+            { code: "USD", name: "AQSh Dollari", flag: "us" },
+            { code: "EUR", name: "Yevro", flag: "eu" },
+            { code: "GBP", name: "Angliya Funsi", flag: "gb" },
+            { code: "JPY", name: "Yaponiya Iyenasi", flag: "jp" },
+            { code: "AUD", name: "Avstraliya Dollari", flag: "au" },
+            { code: "NZD", name: "Yangi Zelandiya Dollari", flag: "nz" },
+            { code: "CAD", name: "Kanada Dollari", flag: "ca" },
+            { code: "CHF", name: "Shveytsariya Franki", flag: "ch" },
+            { code: "CNY", name: "Xitoy Yuani", flag: "cn" }
+        ];
+
+        const state = {
+            events: [],
+            lastUpdated: null,
+            loading: false,
+            activeRange: "7days",
+            impacts: new Set(["high", "medium", "low"]),
+            currency: "all",
+            refreshTimer: null
+        };
+
+        const elements = {};
+
+        // --- Yordamchi funksiyalar ---
+        function getLastUpdate() {
+            const value = Number(localStorage.getItem(LAST_UPDATE_KEY) || 0);
+            return Number.isFinite(value) ? value : 0;
+        }
+
+        function isRefreshDue(force = false) {
+            return force || !getLastUpdate() || Date.now() - getLastUpdate() >= UPDATE_INTERVAL_MS;
+        }
+
+        function getTashkentDateKey(date = new Date()) {
+            return new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+        }
+
+        function shiftDateKey(dateKey, offsetDays) {
+            const [year, month, day] = dateKey.split("-").map(Number);
+            const date = new Date(Date.UTC(year, month - 1, day + offsetDays));
+            return [date.getUTCFullYear(), String(date.getUTCMonth() + 1).padStart(2, "0"), String(date.getUTCDate()).padStart(2, "0")].join("-");
+        }
+
+        function getEventDateKey(event) {
+            const raw = event.ts ?? event.timestamp ?? event.time ?? event.date;
+            if (!raw) return null;
+            let date = (typeof raw === "number" || /^\d{10,13}$/.test(String(raw))) 
+                ? new Date(Number(String(raw).length === 10 ? raw * 1000 : raw)) 
+                : new Date(raw);
+            return Number.isNaN(date.getTime()) ? null : getTashkentDateKey(date);
+        }
+
+        function normalizeImpact(value) {
+            const impact = String(value ?? "").toLowerCase();
+            if (["high", "3", "red"].includes(impact)) return "high";
+            if (["medium", "med", "2", "orange", "yellow"].includes(impact)) return "medium";
+            if (["low", "1", "green"].includes(impact)) return "low";
+            return "unknown";
+        }
+
+        function normalizeEvent(event, index) {
+            const timestamp = Number(event.ts ?? event.timestamp);
+            const rawTime = event.time ?? event.date ?? "";
+            const parsedDate = Number.isFinite(timestamp) && timestamp > 0
+                ? new Date(String(timestamp).length === 10 ? timestamp * 1000 : timestamp)
+                : new Date(rawTime);
+
+            return {
+                id: String(event.id ?? event.event_id ?? `${event.currency ?? ""}_${event.title ?? event.event ?? ""}_${event.ts ?? index}`),
+                currency: String(event.currency ?? event.country_currency ?? "").toUpperCase(),
+                country: String(event.country ?? event.country_code ?? ""),
+                title: String(event.title ?? event.event ?? event.name ?? "Untitled event"),
+                time: parsedDate,
+                dateKey: getEventDateKey(event),
+                impact: normalizeImpact(event.impact ?? event.impact_level),
+                actual: event.actual ?? null,
+                forecast: event.forecast ?? event.consensus ?? null,
+                previous: event.previous ?? null
+            };
+        }
+
+        function formatTime(date) {
+            if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "—";
+            return new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
+        }
+
+        function escapeHTML(value) {
+            return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+        }
+
+        function getRangeBounds(range) {
+            const today = getTashkentDateKey();
+            switch (range) {
+                case "yesterday": return [shiftDateKey(today, -1), shiftDateKey(today, -1)];
+                case "today": return [today, today];
+                case "tomorrow": return [shiftDateKey(today, 1), shiftDateKey(today, 1)];
+                default: return [today, shiftDateKey(today, 7)];
+            }
+        }
+
+        function getFilteredEvents() {
+            const [from, to] = getRangeBounds(state.activeRange);
+            return state.events
+                .filter(event => event.dateKey && event.dateKey >= from && event.dateKey <= to)
+                .filter(event => state.impacts.has(event.impact))
+                .filter(event => state.currency === "all" || event.currency === state.currency)
+                .sort((a, b) => (a.time?.getTime() || 0) - (b.time?.getTime() || 0));
+        }
+
+        // --- UI Render ---
+        function renderCurrencyList() {
+            if (!elements.currencyList) return;
+            elements.currencyList.innerHTML = CURRENCIES.map(curr => {
+                const isActive = (state.currency === "all" && curr.code === "ALL") || (state.currency === curr.code);
+                const flagHtml = curr.flag 
+                    ? `<img src="https://flagcdn.com/w80/${curr.flag}.png" alt="${curr.code}">` 
+                    : `<div style="width:32px; height:24px; background:var(--ec-border); border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:10px;">🌐</div>`;
+                
+                return `
+                    <div class="ec-currency-item ${isActive ? 'is-active' : ''}" data-currency="${curr.code}">
+                        ${flagHtml}
+                        <span>${curr.code}</span>
+                        <small>${curr.name}</small>
+                    </div>
+                `;
+            }).join("");
+
+            elements.currencyList.querySelectorAll(".ec-currency-item").forEach(item => {
+                item.addEventListener("click", () => {
+                    const code = item.dataset.currency;
+                    state.currency = code === "ALL" ? "all" : code;
+                    renderCurrencyList();
+                    renderEvents();
+                });
+            });
+        }
+
+        function renderEvents() {
+            if (!elements.list) return;
+            const events = getFilteredEvents();
+
+            elements.count.textContent = `${events.length} ta yangilik`;
+            elements.lastUpdated.textContent = state.lastUpdated
+                ? `Oxirgi yangilanish: ${new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, dateStyle: "short", timeStyle: "short" }).format(state.lastUpdated)} (Toshkent)`
+                : "Hali yangilanmagan";
+
+            if (state.activeRange === "yesterday") {
+                elements.list.innerHTML = `<div class="ec-empty"><strong>Kecha uchun to'liq ma'lumot mavjud emas</strong><span>API faqat oxirgi 6 soatni beradi.</span></div>`;
+                return;
+            }
+
+            if (!events.length) {
+                elements.list.innerHTML = `<div class="ec-empty"><strong>Yangilik topilmadi</strong><span>Tanlangan filtrlarga mos ma'lumot yo'q.</span></div>`;
+                return;
+            }
+
+            elements.list.innerHTML = events.map(event => {
+                // Valyuta bayrog'ini topish
+                const currData = CURRENCIES.find(c => c.code === event.currency);
+                const flagHtml = currData && currData.flag 
+                    ? `<img src="https://flagcdn.com/w20/${currData.flag}.png" class="ec-flag" alt="${event.currency}">` 
+                    : "";
+
+                return `
+                <article class="ec-event">
+                    <div class="ec-event-time">${formatTime(event.time)}</div>
+                    <div class="ec-event-main">
+                        <div class="ec-event-heading">
+                            ${flagHtml}
+                            <span class="ec-currency">${escapeHTML(event.currency || "—")}</span>
+                            <span class="ec-impact ec-impact-${event.impact}">${event.impact === "unknown" ? "Noma'lum" : event.impact.toUpperCase()}</span>
+                        </div>
+                        <div class="ec-event-title">${escapeHTML(event.title)}</div>
+                        <div class="ec-event-country">${escapeHTML(event.country)}</div>
+                    </div>
+                    <div class="ec-event-value"><span class="ec-value-label">Actual</span><strong>${escapeHTML(event.actual ?? "—")}</strong></div>
+                    <div class="ec-event-value"><span class="ec-value-label">Forecast</span><strong>${escapeHTML(event.forecast ?? "—")}</strong></div>
+                    <div class="ec-event-value"><span class="ec-value-label">Previous</span><strong>${escapeHTML(event.previous ?? "—")}</strong></div>
+                </article>`;
+            }).join("");
+        }
+
+        // --- API va Logic ---
+        async function fetchEvents() {
+            const url = new URL(API_URL);
+            url.searchParams.set("impact", "all");
+            url.searchParams.set("days", "7");
+
+            const response = await fetch(url.toString(), { headers: { "Accept": "application/json" }, cache: "no-store" });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const payload = await response.json();
+            const rawEvents = Array.isArray(payload) ? payload : payload.events;
+            if (!Array.isArray(rawEvents)) throw new Error("API formati xato.");
+
+            state.events = rawEvents.map(normalizeEvent);
+            state.lastUpdated = new Date();
+            localStorage.setItem(LAST_UPDATE_KEY, String(state.lastUpdated.getTime()));
+            renderEvents();
+        }
+
+        async function updateCalendar(force = false) {
+            if (state.loading) return;
+            if (!navigator.onLine) { setStatus("Internet aloqa yo'q", "offline"); return; }
+            
+            if (!isRefreshDue(force)) {
+                state.lastUpdated = getLastUpdate() ? new Date(getLastUpdate()) : null;
+                const remainingMinutes = Math.max(1, Math.ceil((getLastUpdate() + UPDATE_INTERVAL_MS - Date.now()) / 60000));
+                setStatus(`Keyingi yangilanish taxminan ${remainingMinutes} daqiqadan so'ng`, "ok");
+                renderEvents();
+                scheduleNextRefresh();
+                return;
+            }
+
+            state.loading = true;
+            elements.refresh.disabled = true;
+            elements.refresh.textContent = "⏳";
+            setStatus("Yuklanmoqda…", "loading");
+
+            try {
+                await fetchEvents();
+                setStatus("Yangilandi · keyingi yangilanish 6 soatdan so'ng", "ok");
+            } catch (error) {
+                setStatus("Xatolik yuz berdi", "error");
+            } finally {
+                state.loading = false;
+                elements.refresh.disabled = false;
+                elements.refresh.textContent = "↻";
+                scheduleNextRefresh();
+            }
+        }
+
+        function scheduleNextRefresh() {
+            if (state.refreshTimer) clearTimeout(state.refreshTimer);
+            const remaining = getLastUpdate() + UPDATE_INTERVAL_MS - Date.now();
+            if (remaining > 0) state.refreshTimer = setTimeout(() => updateCalendar(), remaining);
+        }
+
+        function setStatus(message, type) {
+            if (!elements.status) return;
+            elements.status.textContent = message;
+            elements.status.dataset.state = type;
+        }
+
+        // --- Event Listeners ---
+        function bindControls() {
+            // Sana tanlash
+            document.querySelectorAll("[data-range]").forEach(button => {
+                button.addEventListener("click", () => {
+                    state.activeRange = button.dataset.range;
+                    document.querySelectorAll("[data-range]").forEach(item => item.classList.toggle("is-active", item === button));
+                    renderEvents();
+                });
+            });
+
+            // Daraja (Impact) tanlash
+            document.querySelectorAll("[data-impact]").forEach(input => {
+                input.addEventListener("change", () => {
+                    if (input.checked) state.impacts.add(input.value);
+                    else state.impacts.delete(input.value);
+                    renderEvents();
+                });
+            });
+
+            // Modal ochish / yopish
+            elements.openFilterBtn.addEventListener("click", () => elements.modalOverlay.classList.add("is-open"));
+            elements.closeFilterBtn.addEventListener("click", () => elements.modalOverlay.classList.remove("is-open"));
+            elements.modalOverlay.addEventListener("click", (e) => {
+                if (e.target === elements.modalOverlay) elements.modalOverlay.classList.remove("is-open");
+            });
+
+            elements.refresh.addEventListener("click", () => updateCalendar(true));
+        }
+
+        function init() {
+            elements.list = document.getElementById("ec-events");
+            elements.count = document.getElementById("ec-count");
+            elements.lastUpdated = document.getElementById("ec-last-updated");
+            elements.status = document.getElementById("ec-status");
+            elements.refresh = document.getElementById("ec-refresh");
+            elements.currencyList = document.getElementById("ec-currency-list");
+            elements.modalOverlay = document.getElementById("ec-modal-overlay");
+            elements.openFilterBtn = document.getElementById("ec-open-filter");
+            elements.closeFilterBtn = document.getElementById("ec-close-filter");
+
+            renderCurrencyList();
+            bindControls();
+
+            const savedTimestamp = getLastUpdate();
+            if (savedTimestamp) {
+                state.lastUpdated = new Date(savedTimestamp);
+                renderEvents();
+            }
+
+            updateCalendar();
+            window.addEventListener("online", () => updateCalendar());
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "visible") updateCalendar();
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>
