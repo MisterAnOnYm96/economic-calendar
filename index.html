@@ -16,7 +16,7 @@
             --ec-border: #26364e;
             --ec-text: #e8eef7;
             --ec-muted: #91a0b6;
-            --ec-accent: #60a5fa; /* Ko'k rang */
+            --ec-accent: #60a5fa;
             
             --ec-high-bg: #4b252e;
             --ec-high-text: #ff8d8d;
@@ -25,7 +25,7 @@
             --ec-low-bg: #173e32;
             --ec-low-text: #65d6a0;
             
-            --ec-red: #ef4444; /* Qizil rang */
+            --ec-red: #ef4444;
         }
 
         body {
@@ -125,7 +125,7 @@
             filter: grayscale(30%);
         }
 
-        /* ================= BADGE VA CHIZIQ (DIVIDER) ================= */
+        /* ================= BADGE VA CHIZIQ ================= */
         .ec-section-header {
             display: flex;
             align-items: center;
@@ -138,7 +138,7 @@
             align-items: center;
             gap: 6px;
             padding: 4px 12px;
-            border-radius: 20px; /* Round-end rectangle */
+            border-radius: 20px;
             font-size: 11px;
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -147,21 +147,18 @@
             border: 1px solid transparent;
         }
 
-        /* Bugun, Ertaga va Sanalar uchun (Ko'k rang) */
         .ec-badge.is-date {
-            background: rgba(96, 165, 250, 0.15); /* Ko'k fon */
+            background: rgba(96, 165, 250, 0.15);
             color: var(--ec-accent);
             border-color: var(--ec-accent);
         }
 
-        /* Hozirgi vaqt va Barchasi o'tib ketgan uchun (Qizil rang) */
         .ec-badge.is-time {
-            background: rgba(239, 68, 68, 0.15); /* Qizil fon */
+            background: rgba(239, 68, 68, 0.15);
             color: var(--ec-red);
             border-color: var(--ec-red);
         }
 
-        /* Badge'dan o'ngga cho'ziladigan chiziq */
         .ec-section-line {
             flex-grow: 1;
             height: 1px;
@@ -169,16 +166,16 @@
         }
 
         .ec-badge.is-date + .ec-section-line {
-            background: var(--ec-accent); /* Ko'k chiziq */
-            opacity: 0.3; /* Biroz xira qilingan */
-        }
-
-        .ec-badge.is-time + .ec-section-line {
-            background: var(--ec-red); /* Qizil chiziq */
+            background: var(--ec-accent);
             opacity: 0.3;
         }
 
-        /* Vaqt qismi (Chap tomonda, 1/5 qism) */
+        .ec-badge.is-time + .ec-section-line {
+            background: var(--ec-red);
+            opacity: 0.3;
+        }
+
+        /* Vaqt qismi */
         .ec-event-time-col {
             width: 20%;
             text-align: right;
@@ -189,7 +186,7 @@
             font-weight: 700;
         }
 
-        /* Kartochka qismi (O'ng tomonda, 4/5 qism) */
+        /* Kartochka qismi */
         .ec-event-card {
             width: 80%;
             background: var(--ec-panel);
@@ -202,7 +199,6 @@
             gap: 8px;
         }
 
-        /* Impact ranglari */
         .ec-card-high { border-left-color: var(--ec-high-text) !important; }
         .ec-card-medium { border-left-color: var(--ec-medium-text) !important; }
         .ec-card-low { border-left-color: var(--ec-low-text) !important; }
@@ -576,9 +572,12 @@
 
             events.forEach(event => {
                 const eventTime = event.time instanceof Date ? event.time.getTime() : 0;
-                const isPast = eventTime > 0 && eventTime < (now - 60000);
+                
+                // QAT'IY MANTIQ: Faqat vaqti o'tgan va BUGUNGA tegishli bo'lsa "o'tib ketgan" hisoblanadi.
+                // Ertaga yoki keyingi kunlar uchun hech qachon "o'tib ketgan" bo'lmaydi.
+                const isPast = (event.dateKey === todayKey) && (eventTime > 0 && eventTime < (now - 60000));
 
-                // 1. Kun o'zgarganini tekshirish va kun badge'ini qo'shish
+                // 1. Kun o'zgarganini tekshirish
                 if (event.dateKey !== lastDateKey) {
                     lastDateKey = event.dateKey;
                     
@@ -589,8 +588,10 @@
                     </div>`;
                 }
 
-                // 2. Hozirgi vaqt ajratgichini qo'shish (faqat birinchi kelgusi yangilik oldidan)
-                if (!isPast && !currentTimeDividerInserted) {
+                // 2. Hozirgi vaqt ajratgichi (faqat BUGUN uchun va birinchi o'tmagan yangilik oldidan)
+                if (event.dateKey === todayKey && !isPast && !currentTimeDividerInserted) {
+                    // Agar bu bugungi birinchi yangilik bo'lsa va u o'tmagan bo'lsa, to'g'ridan-to'g'ri chiziq qo'yiladi.
+                    // Agar undan oldin o'tgan yangiliklar bo'lsa, ular xira bo'lib, keyin chiziq tushadi.
                     htmlContent += `
                     <div class="ec-section-header" style="margin-top: 12px;">
                         <div class="ec-badge is-time">⬤ Hozirgi vaqt</div>
@@ -643,8 +644,8 @@
                 </div>`;
             });
 
-            // Agar barcha yangiliklar o'tib ketgan bo'lsa (divider oxirigacha qo'yilmasa)
-            if (!currentTimeDividerInserted) {
+            // Agar bugungi hamma yangilik o'tib ketgan bo'lsa, "Barchasi o'tib ketgan" chizig'i qo'yiladi
+            if (!currentTimeDividerInserted && events.some(e => e.dateKey === todayKey)) {
                  htmlContent += `
                     <div class="ec-section-header" style="margin-top: 12px;">
                         <div class="ec-badge is-time">⬤ Barchasi o'tib ketgan</div>
