@@ -98,11 +98,11 @@
         .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: #f28b82; }
         .ec-status[data-state="ok"] { color: #6fd3a4; }
 
-        /* ================= YANGILIKLAR RO'YXATI VA KARTOCHKALAR ================= */
+        /* ================= YANGILIKLAR RO'YXATI ================= */
         .ec-events-list {
             display: flex;
             flex-direction: column;
-            gap: 12px; /* Har bir yangilik orasidagi masofa */
+            gap: 12px;
         }
 
         .ec-event-card {
@@ -111,14 +111,9 @@
             border-radius: 14px;
             padding: 16px;
             display: grid;
-            grid-template-columns: 76px minmax(150px, 1fr) 240px;
+            grid-template-columns: 76px minmax(150px, 1fr) 200px;
             gap: 16px;
             align-items: center;
-            transition: border-color 0.2s;
-        }
-
-        .ec-event-card:hover {
-            border-color: var(--ec-border-hover);
         }
 
         .ec-event-time {
@@ -147,11 +142,11 @@
         .ec-event-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
         .ec-event-country { color: var(--ec-muted); font-size: 11px; margin-top: 4px; }
 
-        /* ================= ACT, FOR, PRE (BIR XIL O'LCHAMDA) ================= */
+        /* ================= ACT, FOR, PRE (IXCHAM VA CHIZIQLI) ================= */
         .ec-values-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            gap: 0; /* Orasidagi masofa olib tashlandi, chiziqlar bilan ajratamiz */
         }
 
         .ec-value-box {
@@ -159,30 +154,32 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            gap: 4px;
-            background: var(--ec-panel-2);
-            border: 1px solid var(--ec-border);
-            border-radius: 8px;
-            padding: 8px 4px;
-            min-height: 56px;
+            gap: 2px; /* Nom va qiymat orasidagi masofa */
+            /* Fon va border olib tashlandi */
+            padding: 2px 4px; 
+            min-height: auto; 
+        }
+
+        /* O'rtadagi katakchalarga xira vertikal chiziq */
+        .ec-value-box + .ec-value-box {
+            border-left: 1px solid var(--ec-border);
         }
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 13px; /* Qiymat bilan bir xil o'lchamda */
-            font-weight: 800;
+            font-size: 10px; /* Kichraytirildi */
+            font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1;
         }
 
         .ec-value-box strong {
             font-weight: 700;
-            font-size: 13px; /* Qiymat bilan bir xil o'lchamda */
+            font-size: 12px; /* Kichraytirildi */
             font-variant-numeric: tabular-nums;
             color: var(--ec-text);
             line-height: 1.2;
             text-align: center;
-            margin-top: auto;
         }
 
         .ec-empty {
@@ -257,7 +254,7 @@
             .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
             
             .ec-event-card {
-                grid-template-columns: 1fr; /* Hammasini bitta ustunga */
+                grid-template-columns: 1fr;
                 gap: 10px; padding: 13px 11px; position: relative;
             }
             .ec-event-time {
@@ -266,10 +263,10 @@
             }
             .ec-event-main { padding-right: 50px; }
             
-            .ec-values-row { width: 100%; gap: 8px; }
-            .ec-value-box { padding: 10px 4px; min-height: 60px; }
-            .ec-value-box strong { font-size: 14px; }
-            .ec-value-label { font-size: 14px; }
+            .ec-values-row { width: 100%; gap: 0; margin-top: 6px; }
+            .ec-value-box { padding: 4px 4px; }
+            .ec-value-box strong { font-size: 13px; }
+            .ec-value-label { font-size: 11px; }
             
             .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
             .ec-toolbar { padding: 8px; gap: 8px; }
@@ -305,7 +302,6 @@
         </section>
         <div id="ec-status" class="ec-status" role="status" aria-live="polite">Kalendar tayyorlanmoqda…</div>
 
-        <!-- Har bir yangilik alohida karta ko'rinishida chiqadi -->
         <div id="ec-events" class="ec-events-list">
             <div class="ec-empty">
                 <strong>Ma'lumot yuklanmoqda…</strong>
