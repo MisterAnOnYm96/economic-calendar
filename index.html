@@ -35,66 +35,69 @@
         }
 
         .ec-page {
-            width: min(1200px, calc(100% - 32px));
+            width: min(1200px, calc(100% - 16px)); /* Telefonda chetlarni kamaytirdik */
             margin: 0 auto;
-            padding: 28px 0 40px;
+            padding: 16px 0 40px;
         }
 
         .ec-header {
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
-            gap: 16px;
+            gap: 10px;
         }
 
-        .ec-title-wrap { display: flex; flex-direction: column; gap: 5px; }
-        .ec-header h1 { margin: 0; font-size: clamp(25px, 4vw, 34px); }
-        .ec-subtitle, .ec-footer { color: var(--ec-muted); font-size: 13px; margin: 0; }
+        .ec-title-wrap { display: flex; flex-direction: column; gap: 3px; }
+        .ec-header h1 { margin: 0; font-size: clamp(20px, 5vw, 34px); line-height: 1.2; }
+        .ec-subtitle, .ec-footer { color: var(--ec-muted); font-size: 11px; margin: 0; }
 
         .ec-refresh {
             border: 1px solid var(--ec-border);
-            border-radius: 12px;
+            border-radius: 10px;
             background: var(--ec-panel-2);
             color: var(--ec-text);
-            width: 44px; height: 44px;
+            width: 38px; height: 38px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 22px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+            font-size: 20px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
         }
         .ec-refresh:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
         .ec-refresh:disabled { opacity: .6; cursor: wait; }
 
         .ec-toolbar {
             display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: nowrap; gap: 10px;
+            flex-wrap: nowrap; gap: 6px;
             background: var(--ec-panel); border: 1px solid var(--ec-border);
-            border-radius: 14px; padding: 12px; margin-bottom: 16px;
+            border-radius: 12px; padding: 8px; margin-bottom: 12px;
         }
 
-        .ec-range-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
+        .ec-range-tabs { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+        .ec-range-tabs::-webkit-scrollbar { display: none; }
+        
         .ec-range-tabs button {
-            border: 1px solid transparent; border-radius: 8px;
-            padding: 9px 12px; background: transparent; color: var(--ec-muted);
-            cursor: pointer; font-size: 13px; white-space: nowrap;
+            border: 1px solid transparent; border-radius: 6px;
+            padding: 6px 8px; background: transparent; color: var(--ec-muted);
+            cursor: pointer; font-size: 11px; white-space: nowrap;
         }
         .ec-range-tabs button.is-active {
             background: #1d3b60; border-color: #315d8c; color: #fff;
         }
 
         .ec-filter-btn {
-            border: 1px solid var(--ec-border); border-radius: 8px;
+            border: 1px solid var(--ec-border); border-radius: 6px;
             background: var(--ec-panel-2); color: var(--ec-text);
-            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; flex-shrink: 0;
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; padding: 0;
         }
+        .ec-filter-btn svg { width: 14px; height: 14px; }
         .ec-filter-btn:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
 
         .ec-meta {
             display: flex; align-items: center; justify-content: space-between;
-            color: var(--ec-muted); font-size: 12px; margin: 0 2px 10px;
+            color: var(--ec-muted); font-size: 10px; margin: 0 2px 8px;
         }
 
-        .ec-status { margin-bottom: 12px; color: var(--ec-muted); font-size: 12px; min-height: 16px; }
+        .ec-status { margin-bottom: 10px; color: var(--ec-muted); font-size: 10px; min-height: 14px; }
         .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: #f28b82; }
         .ec-status[data-state="ok"] { color: #6fd3a4; }
 
@@ -102,7 +105,7 @@
         .ec-events-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             width: 75%; /* Ekranning 3/4 qismi (Har doim) */
             margin-left: auto; /* O'ngga suradi, chapda 1/4 bo'sh qoladi */
         }
@@ -110,13 +113,13 @@
         .ec-event-card {
             background: var(--ec-panel);
             border: 1px solid var(--ec-border);
-            border-radius: 12px;
-            padding: 12px 14px;
+            border-radius: 10px;
+            padding: 10px 12px;
             display: grid;
-            grid-template-columns: 55px minmax(100px, 1fr) 160px; /* Yana biroz ixchamlashtirildi */
-            gap: 10px;
+            grid-template-columns: 45px minmax(80px, 1fr) 130px; /* Ustunlar ixchamlashtirildi */
+            gap: 8px;
             align-items: center;
-            border-left: 4px solid var(--ec-border); 
+            border-left: 3px solid var(--ec-border); 
         }
 
         /* Impact ranglari */
@@ -130,16 +133,16 @@
             color: var(--ec-muted); font-size: 11px;
         }
 
-        .ec-event-heading { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .ec-event-heading { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
         
         .ec-flag {
-            width: 16px; height: 11px; border-radius: 2px;
+            width: 14px; height: 10px; border-radius: 2px;
             object-fit: cover; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .ec-currency { color: var(--ec-accent); font-weight: 700; font-size: 11px; }
+        .ec-currency { color: var(--ec-accent); font-weight: 700; font-size: 10px; }
 
-        .ec-event-title { font-size: 12px; font-weight: 600; line-height: 1.3; }
+        .ec-event-title { font-size: 12px; font-weight: 600; line-height: 1.2; word-break: break-word; }
         .ec-event-country { color: var(--ec-muted); font-size: 9px; margin-top: 2px; }
 
         /* ================= ACT, FOR, PRE ================= */
@@ -154,8 +157,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            gap: 2px;
-            padding: 2px 2px; 
+            gap: 1px;
+            padding: 0 2px; 
         }
 
         .ec-value-box + .ec-value-box {
@@ -164,7 +167,7 @@
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1;
@@ -172,7 +175,7 @@
 
         .ec-value-box strong {
             font-weight: 700;
-            font-size: 11px;
+            font-size: 10px;
             font-variant-numeric: tabular-nums;
             color: var(--ec-text);
             line-height: 1.2;
@@ -180,14 +183,14 @@
         }
 
         .ec-empty {
-            display: flex; min-height: 180px; flex-direction: column;
-            align-items: center; justify-content: center; gap: 8px;
-            color: var(--ec-muted); text-align: center; padding: 24px;
-            background: var(--ec-panel); border: 1px solid var(--ec-border); border-radius: 14px;
+            display: flex; min-height: 150px; flex-direction: column;
+            align-items: center; justify-content: center; gap: 6px;
+            color: var(--ec-muted); text-align: center; padding: 16px;
+            background: var(--ec-panel); border: 1px solid var(--ec-border); border-radius: 12px;
         }
-        .ec-empty strong { color: var(--ec-text); }
-        .ec-empty span { font-size: 12px; }
-        .ec-footer { padding: 18px 2px; text-align: center; }
+        .ec-empty strong { color: var(--ec-text); font-size: 12px; }
+        .ec-empty span { font-size: 10px; }
+        .ec-footer { padding: 14px 2px; text-align: center; }
 
         /* ================= MODAL ================= */
         .ec-modal-overlay {
@@ -201,7 +204,7 @@
         .ec-modal {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--ec-panel); border-top-left-radius: 20px; border-top-right-radius: 20px;
-            padding: 20px; z-index: 1001; transform: translateY(100%);
+            padding: 16px; z-index: 1001; transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             max-height: 50vh; overflow-y: auto; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
         }
@@ -209,19 +212,19 @@
 
         .ec-modal-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--ec-border);
+            margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--ec-border);
         }
-        .ec-modal-header h2 { margin: 0; font-size: 18px; }
+        .ec-modal-header h2 { margin: 0; font-size: 16px; }
         .ec-modal-close {
             background: transparent; border: none; color: var(--ec-muted);
-            font-size: 24px; cursor: pointer; padding: 0;
+            font-size: 24px; cursor: pointer; padding: 0; line-height: 1;
         }
 
-        .ec-impact-filter { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
+        .ec-impact-filter { display: flex; gap: 6px; margin-bottom: 16px; width: 100%; }
         .ec-impact-filter label {
-            flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: var(--ec-panel-2); padding: 12px; border-radius: 10px;
-            color: var(--ec-muted); font-size: 13px; cursor: pointer;
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+            background: var(--ec-panel-2); padding: 10px 4px; border-radius: 8px;
+            color: var(--ec-muted); font-size: 11px; cursor: pointer;
             border: 1px solid var(--ec-border); transition: all 0.2s; font-weight: 600;
         }
         .ec-impact-filter input { display: none; }
@@ -230,47 +233,49 @@
         .ec-impact-filter label:has(input[value="medium"]:checked) { background: var(--ec-medium-bg); color: var(--ec-medium-text); border-color: var(--ec-medium-text); }
         .ec-impact-filter label:has(input[value="low"]:checked) { background: var(--ec-low-bg); color: var(--ec-low-text); border-color: var(--ec-low-text); }
 
-        .dot { width: 8px; height: 8px; display: inline-block; border-radius: 50%; }
+        .dot { width: 6px; height: 6px; display: inline-block; border-radius: 50%; }
         .dot.high { background: var(--ec-high-text); }
         .dot.medium { background: var(--ec-medium-text); }
         .dot.low { background: var(--ec-low-text); }
         .ec-impact-filter label:has(input:checked) .dot { background: currentColor; }
 
-        .ec-currency-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-bottom: 20px; }
+        .ec-currency-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-bottom: 16px; }
         .ec-currency-item {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: var(--ec-panel-2); padding: 14px 10px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            background: var(--ec-panel-2); padding: 10px 6px; border-radius: 8px;
             cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
         }
         .ec-currency-item:hover, .ec-currency-item.is-active { border-color: var(--ec-accent); background: #1d3b60; }
-        .ec-currency-item img { width: 28px; height: 20px; border-radius: 3px; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        .ec-currency-item span { font-weight: 700; font-size: 14px; }
+        .ec-currency-item img { width: 24px; height: 16px; border-radius: 2px; object-fit: cover; box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .ec-currency-item span { font-weight: 700; font-size: 12px; }
 
-        /* Mobil moslashuv (3/4 qism saqlanib qoladi) */
-        @media (max-width: 700px) {
-            .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
-            
-            /* width: 75% va margin-left: auto bu yerda ham o'chirilmadi */
-            
-            .ec-event-card {
-                grid-template-columns: 1fr; /* Ustunlarni bitta qilib yig'amiz */
-                gap: 8px; padding: 10px 12px; padding-left: 14px;
-                position: relative;
-            }
-            .ec-event-time {
-                position: absolute; top: 10px; right: 10px;
-                font-size: 10px; color: var(--ec-accent);
-            }
-            .ec-event-main { padding-right: 35px; }
-            
-            .ec-values-row { width: 100%; gap: 0; margin-top: 4px; }
-            .ec-value-box { padding: 2px 2px; }
-            .ec-value-box strong { font-size: 11px; }
+        /* Katta ekranlar uchun (kompyuter) */
+        @media (min-width: 701px) {
+            .ec-page { width: min(1200px, calc(100% - 32px)); padding: 28px 0 40px; }
+            .ec-header { margin-bottom: 24px; align-items: center; gap: 16px; }
+            .ec-header h1 { font-size: clamp(25px, 4vw, 34px); }
+            .ec-subtitle { font-size: 13px; }
+            .ec-refresh { width: 44px; height: 44px; font-size: 22px; border-radius: 12px; }
+            .ec-toolbar { padding: 12px; gap: 10px; margin-bottom: 16px; border-radius: 14px; }
+            .ec-range-tabs { gap: 7px; }
+            .ec-range-tabs button { padding: 9px 12px; font-size: 13px; border-radius: 8px; }
+            .ec-filter-btn { width: 40px; height: 40px; border-radius: 8px; }
+            .ec-filter-btn svg { width: 18px; height: 18px; }
+            .ec-meta { font-size: 12px; margin: 0 2px 10px; }
+            .ec-status { font-size: 12px; min-height: 16px; margin-bottom: 12px; }
+            .ec-events-list { gap: 10px; }
+            .ec-event-card { grid-template-columns: 55px minmax(100px, 1fr) 160px; padding: 12px 14px; gap: 10px; border-radius: 12px; }
+            .ec-event-time { font-size: 11px; }
+            .ec-flag { width: 16px; height: 11px; }
+            .ec-currency { font-size: 11px; }
+            .ec-event-title { font-size: 13px; }
+            .ec-event-country { font-size: 10px; }
             .ec-value-label { font-size: 9px; }
-            
-            .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
-            .ec-toolbar { padding: 8px; gap: 8px; }
-            .ec-range-tabs button { padding: 8px; font-size: 12px; }
+            .ec-value-box strong { font-size: 11px; }
+            .ec-impact-filter label { padding: 12px; font-size: 13px; }
+            .ec-currency-item { padding: 14px 10px; }
+            .ec-currency-item img { width: 28px; height: 20px; }
+            .ec-currency-item span { font-size: 14px; }
         }
     </style>
 </head>
@@ -292,7 +297,7 @@
                 <button type="button" data-range="7days" class="is-active">Keyingi 7 kun</button>
             </div>
             <button type="button" id="ec-open-filter" class="ec-filter-btn" title="Filtr">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
             </button>
         </section>
 
