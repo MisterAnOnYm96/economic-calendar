@@ -103,11 +103,10 @@
             border-radius: 14px; background: var(--ec-panel);
         }
 
-        /* ================= JADVAL VA EVENTLAR (YANGILANGAN GRID) ================= */
+        /* ================= JADVAL VA EVENTLAR ================= */
         .ec-table-head, .ec-event {
             display: grid;
-            /* Vaqt | Yangilik | Actual/Forecast/Previous (o'ng tomonda bitta ustun) */
-            grid-template-columns: 76px minmax(150px, 1fr) 170px;
+            grid-template-columns: 76px minmax(150px, 1fr) 210px; /* O'ng ustun biroz kengaytirildi */
             gap: 14px;
             align-items: center;
         }
@@ -148,14 +147,11 @@
         .ec-event-title { font-size: 13px; font-weight: 600; line-height: 1.4; }
         .ec-event-country { color: var(--ec-muted); font-size: 10px; margin-top: 4px; }
 
-        /* Actual, Forecast, Previous larni bitta qatorga yig'ish */
+        /* ================= ACT, FOR, PRE - ALOHIDA KATAKLAR ================= */
         .ec-values-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            background: var(--ec-panel-2);
-            padding: 8px 10px;
-            border-radius: 8px;
+            gap: 6px;
         }
 
         .ec-value-box {
@@ -163,21 +159,28 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
+            background: var(--ec-panel-2);
+            border: 1px solid var(--ec-border);
+            border-radius: 8px;
+            padding: 8px 4px;
+            min-height: 52px; /* Balandlikni tenglashtirish uchun */
         }
 
         .ec-value-label {
             color: var(--ec-muted);
-            font-size: 9px;
-            font-weight: 700;
+            font-size: 10px;
+            font-weight: 800;
             letter-spacing: 0.5px;
         }
 
         .ec-value-box strong {
-            font-weight: 600;
-            font-size: 12px;
+            font-weight: 700;
+            font-size: 14px; /* O'lcham kattalashtirildi */
             font-variant-numeric: tabular-nums;
             color: var(--ec-text);
+            line-height: 1.2;
+            text-align: center;
         }
 
         .ec-empty {
@@ -251,10 +254,9 @@
             .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
             .ec-table-head { display: none; }
             
-            /* Mobilda ham qulay ko'rinish */
             .ec-event {
                 grid-template-columns: 1fr; /* Hammasini bitta ustunga */
-                gap: 8px; padding: 13px 11px; position: relative;
+                gap: 10px; padding: 13px 11px; position: relative;
             }
             .ec-event-time {
                 position: absolute; top: 13px; right: 11px;
@@ -263,9 +265,11 @@
             .ec-event-main { padding-right: 50px; }
             
             .ec-values-row {
-                margin-top: 8px;
                 width: 100%;
+                gap: 8px;
             }
+            .ec-value-box { padding: 10px 4px; }
+            .ec-value-box strong { font-size: 15px; }
             
             .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
             .ec-toolbar { padding: 8px; gap: 8px; }
@@ -493,7 +497,6 @@
                     ? `<img src="https://flagcdn.com/w20/${currData.flag}.png" class="ec-flag" alt="${event.currency}">` 
                     : "";
 
-                // Qisqartirilgan nomlar (ACT, FOR, PRE)
                 return `
                 <article class="ec-event">
                     <div class="ec-event-time">${formatTime(event.time)}</div>
