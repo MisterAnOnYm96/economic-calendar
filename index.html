@@ -368,7 +368,7 @@
             <div class="ec-range-tabs">
                 <button type="button" data-range="today" class="is-active">Bugun</button>
                 <button type="button" data-range="tomorrow">Ertaga</button>
-                <button type="button" data-range="7days">Keyingi 7 kun</button>
+                <button type="button" data-range="7days">Haftalik</button>
             </div>
             <button type="button" id="ec-open-filter" class="ec-filter-btn" title="Filtr">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
@@ -573,11 +573,10 @@
             events.forEach(event => {
                 const eventTime = event.time instanceof Date ? event.time.getTime() : 0;
                 
-                // QAT'IY MANTIQ: Faqat vaqti o'tgan va BUGUNGA tegishli bo'lsa "o'tib ketgan" hisoblanadi.
-                // Ertaga yoki keyingi kunlar uchun hech qachon "o'tib ketgan" bo'lmaydi.
+                // Qat'iy mantiq: Faqat bugungi va vaqti o'tgan bo'lsa "o'tib ketgan"
                 const isPast = (event.dateKey === todayKey) && (eventTime > 0 && eventTime < (now - 60000));
 
-                // 1. Kun o'zgarganini tekshirish
+                // 1. Kun badge'ini qo'shish
                 if (event.dateKey !== lastDateKey) {
                     lastDateKey = event.dateKey;
                     
@@ -586,15 +585,28 @@
                         <div class="ec-badge is-date">${formatDateBadge(event.dateKey, todayKey, tomorrowKey)}</div>
                         <div class="ec-section-line"></div>
                     </div>`;
+
+                    // Agar bugun bo'lsa va hali "Hozir" chizig'i qo'yilmagan bo'lsa
+                    // va bu kunning birinchi yangiligi bo'lsa, demak bugungi hamma narsa o'tib ketgan yoki hali boshlanmagan.
+                    if (event.dateKey === todayKey && !currentTimeDividerInserted) {
+                        // Agar bu birinchi yangilikning vaqti o'tgan bo'lsa, demak hozirgi vaqt keyinroq keladi
+                        // Agar bu birinchi yangilikning vaqti kelajakda bo'lsa, demak biz hozirgi vaqtga yetib keldik
+                        if (!isPast) {
+                            htmlContent += `
+                            <div class="ec-section-header" style="margin-top: 12px;">
+                                <div class="ec-badge is-time">⬤ Hozir</div>
+                                <div class="ec-section-line"></div>
+                            </div>`;
+                            currentTimeDividerInserted = true;
+                        }
+                    }
                 }
 
-                // 2. Hozirgi vaqt ajratgichi (faqat BUGUN uchun va birinchi o'tmagan yangilik oldidan)
+                // 2. "Hozir" chizig'ini qo'shish (agar kun o'zgarmagan bo'lsa-yu, lekin birinchi marta o'tmagan yangilikka yetilsa)
                 if (event.dateKey === todayKey && !isPast && !currentTimeDividerInserted) {
-                    // Agar bu bugungi birinchi yangilik bo'lsa va u o'tmagan bo'lsa, to'g'ridan-to'g'ri chiziq qo'yiladi.
-                    // Agar undan oldin o'tgan yangiliklar bo'lsa, ular xira bo'lib, keyin chiziq tushadi.
                     htmlContent += `
                     <div class="ec-section-header" style="margin-top: 12px;">
-                        <div class="ec-badge is-time">⬤ Hozirgi vaqt</div>
+                        <div class="ec-badge is-time">⬤ Hozir</div>
                         <div class="ec-section-line"></div>
                     </div>`;
                     currentTimeDividerInserted = true;
@@ -643,15 +655,6 @@
                     </div>
                 </div>`;
             });
-
-            // Agar bugungi hamma yangilik o'tib ketgan bo'lsa, "Barchasi o'tib ketgan" chizig'i qo'yiladi
-            if (!currentTimeDividerInserted && events.some(e => e.dateKey === todayKey)) {
-                 htmlContent += `
-                    <div class="ec-section-header" style="margin-top: 12px;">
-                        <div class="ec-badge is-time">⬤ Barchasi o'tib ketgan</div>
-                        <div class="ec-section-line"></div>
-                    </div>`;
-            }
 
             elements.list.innerHTML = htmlContent;
         }
