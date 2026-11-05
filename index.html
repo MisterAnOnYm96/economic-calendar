@@ -3,270 +3,276 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#101827">
+    <meta name="theme-color" content="#000000">
     <title>Economic Calendar</title>
     <style>
         * { box-sizing: border-box; }
 
         :root {
             color-scheme: dark;
-            --ec-bg: #0b1220;
-            --ec-panel: #111c2e;
-            --ec-panel-2: #172338;
-            --ec-border: #26364e;
-            --ec-text: #e8eef7;
-            --ec-muted: #91a0b6;
-            --ec-accent: #60a5fa;
-            --ec-green: #35b779;
-            --ec-red: #f05252;
+            --ec-bg: #000000;
+            --ec-panel: #121212;
+            --ec-panel-2: #1e1e1e;
+            --ec-border: #2a2a2a;
+            --ec-text: #ffffff;
+            --ec-muted: #888888;
+            --ec-accent: #3b82f6;
+            --ec-green: #22c55e;
+            --ec-red: #ef4444;
+            --ec-orange: #f59e0b;
         }
 
         body {
             margin: 0;
             background: var(--ec-bg);
             color: var(--ec-text);
-            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow-x: hidden;
         }
 
         .ec-page {
-            width: min(1200px, calc(100% - 32px));
+            width: min(600px, 100%);
             margin: 0 auto;
-            padding: 28px 0 40px;
+            padding: 20px 16px 40px;
         }
 
+        /* Header qismi */
         .ec-header {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
         }
 
-        .ec-title-wrap { display: flex; flex-direction: column; gap: 5px; }
-        .ec-header h1 { margin: 0; font-size: clamp(25px, 4vw, 34px); }
-        .ec-subtitle, .ec-footer { color: var(--ec-muted); font-size: 13px; margin: 0; }
+        .ec-title-wrap { display: flex; flex-direction: column; gap: 4px; }
+        .ec-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+        .ec-subtitle { color: var(--ec-muted); font-size: 13px; margin: 0; }
 
         .ec-refresh {
-            border: 1px solid var(--ec-border);
-            border-radius: 12px;
+            border: none;
+            border-radius: 50%;
             background: var(--ec-panel-2);
             color: var(--ec-text);
             width: 44px; height: 44px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 22px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+            font-size: 20px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
         }
-        .ec-refresh:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
+        .ec-refresh:hover { background: #333; }
         .ec-refresh:disabled { opacity: .6; cursor: wait; }
 
+        /* Filtr va Kunlar paneli */
         .ec-toolbar {
             display: flex; align-items: center; justify-content: space-between;
             flex-wrap: nowrap; gap: 10px;
-            background: var(--ec-panel); border: 1px solid var(--ec-border);
-            border-radius: 14px; padding: 12px; margin-bottom: 16px;
+            background: var(--ec-panel); border-radius: 16px;
+            padding: 8px; margin-bottom: 20px;
         }
 
-        .ec-range-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
+        .ec-range-tabs {
+            display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
+        }
+        .ec-range-tabs::-webkit-scrollbar { display: none; }
 
         .ec-range-tabs button {
-            border: 1px solid transparent; border-radius: 8px;
-            padding: 9px 12px; background: transparent;
-            color: var(--ec-muted); cursor: pointer; font-size: 13px; white-space: nowrap;
+            border: none; border-radius: 12px;
+            padding: 10px 14px; background: transparent;
+            color: var(--ec-muted); cursor: pointer; font-size: 13px;
+            font-weight: 600; white-space: nowrap; transition: 0.2s;
         }
 
-        .ec-range-tabs button.is-active { background: #1d3b60; border-color: #315d8c; color: #fff; }
+        .ec-range-tabs button.is-active {
+            background: var(--ec-panel-2); color: var(--ec-text);
+        }
 
         .ec-filter-btn {
-            border: 1px solid var(--ec-border); border-radius: 8px;
+            border: none; border-radius: 12px;
             background: var(--ec-panel-2); color: var(--ec-text);
-            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; flex-shrink: 0;
+            width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; transition: 0.2s;
         }
-        .ec-filter-btn:hover { border-color: var(--ec-accent); color: var(--ec-accent); }
+        .ec-filter-btn:hover { background: #333; }
 
-        .ec-meta {
-            display: flex; align-items: center; justify-content: space-between;
-            color: var(--ec-muted); font-size: 12px; margin: 0 2px 10px;
-        }
-
-        .ec-status {
-            margin-bottom: 12px; color: var(--ec-muted); font-size: 12px; min-height: 16px;
-        }
-        .ec-status[data-state="error"], .ec-status[data-state="offline"] { color: var(--ec-red); }
-        .ec-status[data-state="ok"] { color: var(--ec-green); }
-
-        .ec-table-wrap {
-            overflow: hidden; border: 1px solid var(--ec-border);
-            border-radius: 14px; background: var(--ec-panel);
+        /* Yangiliklar ro'yxati (Card uslubida) */
+        .ec-events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        /* Jadval tuzilishi: Vaqt ustuni kengroq qilindi */
-        .ec-table-head, .ec-event {
-            display: grid;
-            grid-template-columns: 90px minmax(180px, 1.5fr) repeat(3, minmax(80px, .7fr));
-            gap: 14px; align-items: center;
+        .ec-event-card {
+            display: flex;
+            background: var(--ec-panel);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
         }
 
-        .ec-table-head {
-            padding: 13px 16px; background: var(--ec-panel-2);
-            color: var(--ec-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+        /* Chap tarafdagi rangli chiziq (High - qizil, Medium - sariq, Low - yashil) */
+        .ec-event-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--ec-border);
+        }
+        .ec-event-card.impact-high::before { background: var(--ec-red); }
+        .ec-event-card.impact-medium::before { background: var(--ec-orange); }
+        .ec-event-card.impact-low::before { background: var(--ec-green); }
+
+        /* Chap ustun: Vaqt */
+        .ec-card-time-col {
+            width: 90px;
+            padding: 16px 10px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
         }
 
-        .ec-event {
-            padding: 15px 16px; border-top: 1px solid var(--ec-border);
+        .ec-card-time {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ec-text);
         }
 
-        /* Vaqt va Taymer ustuni */
-        .ec-time-col {
+        .ec-card-timer {
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .ec-card-timer.future { color: var(--ec-green); }
+        .ec-card-timer.past { color: var(--ec-red); }
+
+        /* O'ng ustun: Ma'lumotlar */
+        .ec-card-content {
+            flex-grow: 1;
+            padding: 16px 16px 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ec-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .ec-card-flag {
+            width: 24px; height: 16px;
+            border-radius: 3px;
+            object-fit: cover;
+            margin-top: 2px;
+        }
+
+        .ec-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        /* Daraja yulduzchalari */
+        .ec-card-stars {
+            display: flex;
+            gap: 2px;
+            margin-top: -4px;
+        }
+        .ec-star {
+            font-size: 14px;
+            color: #333; /* Bo'sh yulduz rangi */
+        }
+        .ec-star.active-high { color: var(--ec-red); }
+        .ec-star.active-medium { color: var(--ec-orange); }
+        .ec-star.active-low { color: var(--ec-green); }
+
+        /* Pastki qism: Forecast / Previous */
+        .ec-card-data {
+            display: flex;
+            border-top: 1px solid var(--ec-border);
+            padding-top: 12px;
+            gap: 20px;
+        }
+
+        .ec-data-item {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        .ec-event-time {
-            font-variant-numeric: tabular-nums;
+        .ec-data-label {
+            font-size: 10px;
+            color: var(--ec-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .ec-data-value {
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--ec-text);
         }
 
-        .ec-event-timer {
-            font-size: 11px;
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .ec-event-timer.past { color: var(--ec-red); }
-        .ec-event-timer.future { color: var(--ec-green); }
-
-        .ec-event-heading {
-            display: flex; align-items: center; gap: 8px; margin-bottom: 5px;
-        }
-
-        .ec-flag {
-            width: 18px; height: 13px; border-radius: 2px;
-            object-fit: cover; border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .ec-currency { color: var(--ec-accent); font-weight: 700; font-size: 12px; }
-
-        .ec-impact {
-            border-radius: 5px; padding: 3px 5px; font-size: 9px; font-weight: 800;
-        }
-
-        .ec-impact-high { color: #ff8d8d; background: #4b252e; }
-        .ec-impact-medium { color: #f5c36b; background: #49391f; }
-        .ec-impact-low { color: #65d6a0; background: #173e32; }
-        .ec-impact-unknown { color: var(--ec-muted); background: var(--ec-panel-2); }
-
-        .ec-event-title { font-size: 13px; font-weight: 600; line-height: 1.4; }
-        .ec-event-country, .ec-value-label { color: var(--ec-muted); font-size: 10px; margin-top: 4px; }
-
-        .ec-event-value {
-            display: flex; flex-direction: column; gap: 4px;
-            font-size: 12px; overflow-wrap: anywhere;
-        }
-
-        .ec-event-value strong { font-weight: 600; font-variant-numeric: tabular-nums; }
-
+        /* Empty state */
         .ec-empty {
-            display: flex; min-height: 180px; flex-direction: column;
+            display: flex; min-height: 200px; flex-direction: column;
             align-items: center; justify-content: center; gap: 8px;
             color: var(--ec-muted); text-align: center; padding: 24px;
+            background: var(--ec-panel); border-radius: 16px;
         }
-        .ec-empty strong { color: var(--ec-text); }
-        .ec-empty span { font-size: 12px; }
-
-        .ec-footer { padding: 18px 2px; text-align: center; }
+        .ec-empty strong { color: var(--ec-text); font-size: 16px; }
+        .ec-empty span { font-size: 13px; }
 
         /* ================= MODAL ================= */
         .ec-modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px);
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px);
             z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
         }
         .ec-modal-overlay.is-open { opacity: 1; visibility: visible; }
 
         .ec-modal {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--ec-panel); border-top-left-radius: 20px; border-top-right-radius: 20px;
-            padding: 20px; z-index: 1001; transform: translateY(100%);
+            background: var(--ec-panel); border-top-left-radius: 24px; border-top-right-radius: 24px;
+            padding: 24px; z-index: 1001; transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 50vh; overflow-y: auto; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            max-height: 60vh; overflow-y: auto;
         }
         .ec-modal-overlay.is-open .ec-modal { transform: translateY(0); }
 
         .ec-modal-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--ec-border);
+            margin-bottom: 20px;
         }
-        .ec-modal-header h2 { margin: 0; font-size: 18px; }
-        .ec-modal-close { background: transparent; border: none; color: var(--ec-muted); font-size: 24px; cursor: pointer; padding: 0; }
+        .ec-modal-header h2 { margin: 0; font-size: 20px; font-weight: 700; }
+        .ec-modal-close { background: transparent; border: none; color: var(--ec-muted); font-size: 28px; cursor: pointer; padding: 0; line-height: 1; }
 
-        .ec-impact-filter { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
+        .ec-impact-filter { display: flex; gap: 10px; margin-bottom: 24px; width: 100%; }
         .ec-impact-filter label {
             flex: 1; display: flex; align-items: center; justify-content: center;
-            gap: 8px; background: var(--ec-panel-2); padding: 12px;
-            border-radius: 10px; color: var(--ec-muted); font-size: 13px;
+            gap: 8px; background: var(--ec-panel-2); padding: 14px;
+            border-radius: 12px; color: var(--ec-muted); font-size: 14px;
             cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
+            font-weight: 600;
         }
         .ec-impact-filter label:has(input:checked) { border-color: var(--ec-border); color: var(--ec-text); }
         .ec-impact-filter input { display: none; }
 
-        .dot { width: 8px; height: 8px; display: inline-block; border-radius: 50%; }
-        .dot.high { background: var(--ec-red); }
-        .dot.medium { background: #e9a23b; }
-        .dot.low { background: var(--ec-green); }
-
-        .ec-currency-list {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-bottom: 20px;
-        }
-
+        .ec-currency-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 20px; }
         .ec-currency-item {
             display: flex; align-items: center; justify-content: center;
             gap: 8px; background: var(--ec-panel-2); padding: 14px 10px;
-            border-radius: 10px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
+            border-radius: 12px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
+            font-weight: 600; font-size: 14px;
         }
-        .ec-currency-item:hover, .ec-currency-item.is-active { border-color: var(--ec-accent); background: #1d3b60; }
-        .ec-currency-item img { width: 28px; height: 20px; border-radius: 3px; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        .ec-currency-item span { font-weight: 700; font-size: 14px; }
+        .ec-currency-item:hover, .ec-currency-item.is-active { border-color: var(--ec-accent); background: rgba(59, 130, 246, 0.1); }
+        .ec-currency-item img { width: 24px; height: 16px; border-radius: 2px; object-fit: cover; }
 
-        /* Mobil moslashuv */
-        @media (max-width: 700px) {
-            .ec-page { width: min(100% - 20px, 560px); padding-top: 18px; }
-            .ec-table-head { display: none; }
-            .ec-event {
-                grid-template-columns: 70px 1fr;
-                gap: 12px;
-                padding: 13px 11px;
-                align-items: flex-start;
-            }
-            
-            .ec-time-col {
-                grid-row: 1 / 3;
-                padding-top: 2px;
-            }
-
-            .ec-event-main { grid-column: 2; }
-            
-            /* Actual/Forecast larni pastga, 2-ustunga joylash */
-            .ec-event-value {
-                grid-column: 2;
-                display: inline-flex; flex-direction: row; align-items: center;
-                gap: 5px; background: var(--ec-panel-2); padding: 4px 8px;
-                border-radius: 6px; margin-right: 5px; margin-bottom: 4px; font-size: 11px;
-            }
-            
-            .ec-event-value .ec-value-label { margin-top: 0; font-size: 9px; }
-            .ec-event-value strong { font-size: 11px; }
-            .ec-meta { align-items: flex-start; flex-direction: column; gap: 5px; }
-            
-            .ec-toolbar { padding: 8px; gap: 8px; }
-            .ec-range-tabs button { padding: 8px; font-size: 12px; }
-        }
+        .ec-meta { display: flex; align-items: center; justify-content: space-between; color: var(--ec-muted); font-size: 12px; margin-bottom: 16px; font-weight: 500; }
+        .ec-status { margin-bottom: 16px; color: var(--ec-muted); font-size: 12px; }
     </style>
 </head>
 <body>
@@ -274,59 +280,44 @@
         <header class="ec-header">
             <div class="ec-title-wrap">
                 <h1>Economic Calendar</h1>
-                <p class="ec-subtitle">Global iqtisodiy yangiliklar · Toshkent vaqti (UTC+5)</p>
+                <p class="ec-subtitle">Global yangiliklar · Toshkent (UTC+5)</p>
             </div>
-            <button id="ec-refresh" class="ec-refresh" type="button" aria-label="Yangilash" title="Yangilash">↻</button>
+            <button id="ec-refresh" class="ec-refresh" type="button">↻</button>
         </header>
 
-        <section class="ec-toolbar" aria-label="Sana va filtrlar">
+        <section class="ec-toolbar">
             <div class="ec-range-tabs">
                 <button type="button" data-range="yesterday">Kecha</button>
                 <button type="button" data-range="today">Bugun</button>
                 <button type="button" data-range="tomorrow">Ertaga</button>
                 <button type="button" data-range="7days" class="is-active">Keyingi 7 kun</button>
             </div>
-            <button type="button" id="ec-open-filter" class="ec-filter-btn" title="Filtr">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            <button type="button" id="ec-open-filter" class="ec-filter-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
             </button>
         </section>
 
         <section class="ec-meta">
             <span id="ec-count">0 ta yangilik</span>
-            <span id="ec-last-updated">Hali yangilanmagan</span>
-        </section>
-        <div id="ec-status" class="ec-status" role="status" aria-live="polite">Kalendar tayyorlanmoqda…</div>
-
-        <section class="ec-table-wrap" aria-label="Iqtisodiy yangiliklar">
-            <div class="ec-table-head">
-                <span>Vaqt</span>
-                <span>Yangilik</span>
-                <span>Actual</span>
-                <span>Forecast</span>
-                <span>Previous</span>
-            </div>
-            <div id="ec-events" class="ec-events">
-                <div class="ec-empty">
-                    <strong>Ma'lumot yuklanmoqda…</strong>
-                </div>
-            </div>
+            <span id="ec-last-updated">Yuklanmoqda...</span>
         </section>
 
-        <footer class="ec-footer">
-            Manba: ShowMyTrades · Avtomatik yangilanish: 6 soatda bir marta.
-        </footer>
+        <div id="ec-events" class="ec-events-list">
+            <div class="ec-empty"><strong>Ma'lumot yuklanmoqda…</strong></div>
+        </div>
     </main>
 
+    <!-- Modal -->
     <div class="ec-modal-overlay" id="ec-modal-overlay">
         <div class="ec-modal">
             <div class="ec-modal-header">
                 <h2>Filtrlash</h2>
                 <button class="ec-modal-close" id="ec-close-filter">&times;</button>
             </div>
-            <div class="ec-impact-filter" aria-label="Impact filtri">
-                <label><input type="checkbox" data-impact value="high" checked><i class="dot high"></i> High</label>
-                <label><input type="checkbox" data-impact value="medium" checked><i class="dot medium"></i> Medium</label>
-                <label><input type="checkbox" data-impact value="low" checked><i class="dot low"></i> Low</label>
+            <div class="ec-impact-filter">
+                <label><input type="checkbox" data-impact value="high" checked> High</label>
+                <label><input type="checkbox" data-impact value="medium" checked> Medium</label>
+                <label><input type="checkbox" data-impact value="low" checked> Low</label>
             </div>
             <div class="ec-currency-list" id="ec-currency-list"></div>
         </div>
@@ -350,7 +341,7 @@
         };
 
         const elements = {};
-        let timerInterval = null; // Har daqiqada taymerni yangilash uchun
+        let timerInterval = null;
 
         function getLastUpdate() { return Number(localStorage.getItem(LAST_UPDATE_KEY) || 0); }
         function isRefreshDue(force = false) { return force || !getLastUpdate() || Date.now() - getLastUpdate() >= UPDATE_INTERVAL_MS; }
@@ -385,10 +376,9 @@
                 ? new Date(String(timestamp).length === 10 ? timestamp * 1000 : timestamp) : new Date(rawTime);
 
             return {
-                id: String(event.id ?? event.event_id ?? `${event.currency ?? ""}_${event.title ?? event.event ?? ""}_${event.ts ?? index}`),
-                currency: String(event.currency ?? event.country_currency ?? "").toUpperCase(),
-                country: String(event.country ?? event.country_code ?? ""),
-                title: String(event.title ?? event.event ?? event.name ?? "Untitled event"),
+                id: String(event.id ?? event.event_id ?? `${event.currency ?? ""}_${event.title ?? ""}_${event.ts ?? index}`),
+                currency: String(event.currency ?? "").toUpperCase(),
+                title: String(event.title ?? event.event ?? "Untitled event"),
                 time: parsedDate, dateKey: getEventDateKey(event),
                 impact: normalizeImpact(event.impact ?? event.impact_level),
                 actual: event.actual ?? null, forecast: event.forecast ?? event.consensus ?? null, previous: event.previous ?? null
@@ -400,10 +390,9 @@
             return new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
         }
 
-        // Yangilikkacha yoki keyin qancha vaqt o'tganini HH:MM shaklida hisoblash
+        // HH:MM va so'z bilan (3h 49m) formatida taymer
         function getCountdown(targetDate) {
             if (!(targetDate instanceof Date) || Number.isNaN(targetDate.getTime())) return null;
-            
             const now = new Date();
             const diffMs = targetDate.getTime() - now.getTime();
             const isPast = diffMs < 0;
@@ -412,8 +401,11 @@
             const hours = Math.floor(absMs / (1000 * 60 * 60));
             const minutes = Math.floor((absMs % (1000 * 60 * 60)) / (1000 * 60));
             
-            const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-            return { text: timeStr, isPast };
+            let text = "";
+            if (hours > 0) text += `${hours}h `;
+            text += `${minutes}m`;
+
+            return { text: text.trim(), isPast };
         }
 
         function escapeHTML(value) {
@@ -460,19 +452,33 @@
             });
         }
 
+        // Yulduzchalarni chizish funksiyasi
+        function renderStars(impact) {
+            let starsHtml = '<div class="ec-card-stars">';
+            const maxStars = 3;
+            let activeCount = 0;
+            let activeClass = "";
+
+            if (impact === "high") { activeCount = 3; activeClass = "active-high"; }
+            else if (impact === "medium") { activeCount = 2; activeClass = "active-medium"; }
+            else if (impact === "low") { activeCount = 1; activeClass = "active-low"; }
+
+            for (let i = 0; i < maxStars; i++) {
+                const isActive = i < activeCount;
+                starsHtml += `<span class="ec-star ${isActive ? activeClass : ''}">★</span>`;
+            }
+            starsHtml += '</div>';
+            return starsHtml;
+        }
+
         function renderEvents() {
             if (!elements.list) return;
             const events = getFilteredEvents();
 
             elements.count.textContent = `${events.length} ta yangilik`;
             elements.lastUpdated.textContent = state.lastUpdated
-                ? `Oxiri: ${new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, dateStyle: "short", timeStyle: "short" }).format(state.lastUpdated)} (Toshkent)`
+                ? `${new Intl.DateTimeFormat("uz-UZ", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit" }).format(state.lastUpdated)} da yangilandi`
                 : "Hali yangilanmagan";
-
-            if (state.activeRange === "yesterday") {
-                elements.list.innerHTML = `<div class="ec-empty"><strong>Kecha uchun to'liq ma'lumot mavjud emas</strong><span>API faqat oxirgi 6 soatni beradi.</span></div>`;
-                return;
-            }
 
             if (!events.length) {
                 elements.list.innerHTML = `<div class="ec-empty"><strong>Yangilik topilmadi</strong><span>Tanlangan filtrlarga mos ma'lumot yo'q.</span></div>`;
@@ -482,62 +488,63 @@
             elements.list.innerHTML = events.map(event => {
                 const currData = CURRENCIES.find(c => c.code === event.currency);
                 const flagHtml = currData && currData.flag 
-                    ? `<img src="https://flagcdn.com/w20/${currData.flag}.png" class="ec-flag" alt="${event.currency}">` : "";
+                    ? `<img src="https://flagcdn.com/w40/${currData.flag}.png" class="ec-card-flag" alt="${event.currency}">` 
+                    : `<div class="ec-card-flag" style="background:#333"></div>`;
 
-                // Vaqt va Taymerni hisoblash
                 const countdown = getCountdown(event.time);
                 const timerClass = countdown && countdown.isPast ? "past" : "future";
-                const timerText = countdown ? countdown.text : "—";
+                const timerText = countdown ? countdown.text : "";
+                
+                // Faqat mavjud ma'lumotlarni ko'rsatish (bo'sh bo'lsa yashirish)
+                let dataHtml = '';
+                if (event.forecast || event.previous) {
+                    dataHtml = `<div class="ec-card-data">`;
+                    if (event.forecast !== null) {
+                        dataHtml += `<div class="ec-data-item"><span class="ec-data-label">Forecast</span><span class="ec-data-value">${escapeHTML(event.forecast)}</span></div>`;
+                    }
+                    if (event.previous !== null) {
+                        dataHtml += `<div class="ec-data-item"><span class="ec-data-label">Previous</span><span class="ec-data-value">${escapeHTML(event.previous)}</span></div>`;
+                    }
+                    dataHtml += `</div>`;
+                }
 
                 return `
-                <article class="ec-event" data-time="${event.time.getTime()}">
-                    <div class="ec-time-col">
-                        <div class="ec-event-time">${formatTime(event.time)}</div>
-                        <div class="ec-event-timer ${timerClass}">
-                            ${countdown && countdown.isPast ? '↓' : '↑'} ${timerText}
-                        </div>
+                <article class="ec-event-card impact-${event.impact}" data-time="${event.time.getTime()}">
+                    <div class="ec-card-time-col">
+                        <div class="ec-card-time">${formatTime(event.time)}</div>
+                        ${countdown ? `<div class="ec-card-timer ${timerClass}">${timerText}</div>` : ''}
                     </div>
-                    <div class="ec-event-main">
-                        <div class="ec-event-heading">
+                    
+                    <div class="ec-card-content">
+                        <div class="ec-card-header">
                             ${flagHtml}
-                            <span class="ec-currency">${escapeHTML(event.currency || "—")}</span>
-                            <span class="ec-impact ec-impact-${event.impact}">${event.impact === "unknown" ? "Noma'lum" : event.impact.toUpperCase()}</span>
+                            <div class="ec-card-title">${escapeHTML(event.title)}</div>
                         </div>
-                        <div class="ec-event-title">${escapeHTML(event.title)}</div>
-                        <div class="ec-event-country">${escapeHTML(event.country)}</div>
+                        ${renderStars(event.impact)}
+                        ${dataHtml}
                     </div>
-                    <div class="ec-event-value"><span class="ec-value-label">Actual</span><strong>${escapeHTML(event.actual ?? "—")}</strong></div>
-                    <div class="ec-event-value"><span class="ec-value-label">Forecast</span><strong>${escapeHTML(event.forecast ?? "—")}</strong></div>
-                    <div class="ec-event-value"><span class="ec-value-label">Previous</span><strong>${escapeHTML(event.previous ?? "—")}</strong></div>
                 </article>`;
             }).join("");
 
-            // Yangi ma'lumotlar chiqqandan so'ng taymerni ishga tushirish
             startTimerUpdates();
         }
 
-        // Har bir daqiqada taymerlarni yangilab turuvchi funksiya
         function startTimerUpdates() {
             if (timerInterval) clearInterval(timerInterval);
-            
             timerInterval = setInterval(() => {
-                const eventElements = document.querySelectorAll(".ec-event");
-                if (!eventElements.length) return;
-
-                eventElements.forEach(el => {
+                document.querySelectorAll(".ec-event-card").forEach(el => {
                     const eventTime = Number(el.getAttribute("data-time"));
                     if (!eventTime) return;
-                    
-                    const timerEl = el.querySelector(".ec-event-timer");
+                    const timerEl = el.querySelector(".ec-card-timer");
                     if (!timerEl) return;
 
                     const countdown = getCountdown(new Date(eventTime));
-                    if (!countdown) return;
-
-                    timerEl.className = `ec-event-timer ${countdown.isPast ? 'past' : 'future'}`;
-                    timerEl.innerHTML = `${countdown.isPast ? '↓' : '↑'} ${countdown.text}`;
+                    if (countdown) {
+                        timerEl.className = `ec-card-timer ${countdown.isPast ? 'past' : 'future'}`;
+                        timerEl.textContent = countdown.text;
+                    }
                 });
-            }, 60000); // 60000 ms = 1 daqiqa
+            }, 60000); 
         }
 
         async function fetchEvents() {
@@ -560,12 +567,10 @@
 
         async function updateCalendar(force = false) {
             if (state.loading) return;
-            if (!navigator.onLine) { setStatus("Internet aloqa yo'q", "offline"); return; }
+            if (!navigator.onLine) { return; }
             
             if (!isRefreshDue(force)) {
                 state.lastUpdated = getLastUpdate() ? new Date(getLastUpdate()) : null;
-                const remainingMinutes = Math.max(1, Math.ceil((getLastUpdate() + UPDATE_INTERVAL_MS - Date.now()) / 60000));
-                setStatus(`Keyingi yangilanish taxminan ${remainingMinutes} daqiqadan so'ng`, "ok");
                 renderEvents();
                 scheduleNextRefresh();
                 return;
@@ -574,13 +579,11 @@
             state.loading = true;
             elements.refresh.disabled = true;
             elements.refresh.textContent = "⏳";
-            setStatus("Yuklanmoqda…", "loading");
 
             try {
                 await fetchEvents();
-                setStatus("Yangilandi · keyingi yangilanish 6 soatdan so'ng", "ok");
             } catch (error) {
-                setStatus("Xatolik yuz berdi", "error");
+                console.error(error);
             } finally {
                 state.loading = false;
                 elements.refresh.disabled = false;
@@ -593,12 +596,6 @@
             if (state.refreshTimer) clearTimeout(state.refreshTimer);
             const remaining = getLastUpdate() + UPDATE_INTERVAL_MS - Date.now();
             if (remaining > 0) state.refreshTimer = setTimeout(() => updateCalendar(), remaining);
-        }
-
-        function setStatus(message, type) {
-            if (!elements.status) return;
-            elements.status.textContent = message;
-            elements.status.dataset.state = type;
         }
 
         function bindControls() {
@@ -631,7 +628,6 @@
             elements.list = document.getElementById("ec-events");
             elements.count = document.getElementById("ec-count");
             elements.lastUpdated = document.getElementById("ec-last-updated");
-            elements.status = document.getElementById("ec-status");
             elements.refresh = document.getElementById("ec-refresh");
             elements.currencyList = document.getElementById("ec-currency-list");
             elements.modalOverlay = document.getElementById("ec-modal-overlay");
@@ -649,9 +645,6 @@
 
             updateCalendar();
             window.addEventListener("online", () => updateCalendar());
-            document.addEventListener("visibilitychange", () => {
-                if (document.visibilityState === "visible") updateCalendar();
-            });
         }
 
         document.addEventListener("DOMContentLoaded", init);
