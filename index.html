@@ -448,7 +448,7 @@
         const API_URL = "https://showmytrades.com/api/public/calendar/v1";
         const UPDATE_INTERVAL_MS = 6 * 60 * 60 * 1000;
         const LAST_UPDATE_KEY = "economic_calendar_last_update";
-        const DATA_CACHE_KEY = "economic_calendar_data_cache"; 
+        const DATA_CACHE_KEY = "economic_calendar_data_cache"; // localStorage da saqlanadi
         const TIME_ZONE = "Asia/Tashkent";
 
         const CURRENCIES = [
@@ -475,9 +475,10 @@
             return Number.isFinite(value) ? value : 0;
         }
 
+        // sessionStorage o'rniga localStorage ishlatildi
         function loadCachedData() {
             try {
-                const cached = sessionStorage.getItem(DATA_CACHE_KEY);
+                const cached = localStorage.getItem(DATA_CACHE_KEY);
                 if (cached) {
                     const parsed = JSON.parse(cached);
                     state.events = parsed.map(ev => ({
@@ -498,7 +499,7 @@
                     ...ev,
                     time: ev.time instanceof Date ? ev.time.toISOString() : ev.time
                 }));
-                sessionStorage.setItem(DATA_CACHE_KEY, JSON.stringify(toSave));
+                localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(toSave));
             } catch (e) {
                 console.warn("Keshni saqlashda xatolik", e);
             }
@@ -875,7 +876,7 @@
             renderCurrencyList();
             bindControls();
 
-            // Keshdan yuklash
+            // Keshdan yuklash (Endi localStorage dan yuklanadi, brauzer yopilsa ham qoladi)
             const hasCache = loadCachedData();
             const savedTimestamp = getLastUpdate();
             if (savedTimestamp) {
@@ -887,10 +888,7 @@
                 updateStatusUI();
             }
 
-            // API ga faqat quyidagi hollarda murojaat qilamiz:
-            // 1. Kesh bo'sh bo'lsa (!hasCache)
-            // 2. 6 soatlik vaqt o'tgan bo'lsa (isRefreshDue())
-            // Aks holda, hech qanday orqa fon so'rovi yuborilmaydi
+            // API ga faqat kesh bo'sh bo'lsa yoki 6 soat o'tgan bo'lsa murojaat qilamiz
             if (!hasCache || isRefreshDue()) {
                 updateCalendar();
             } else {
@@ -901,7 +899,6 @@
             window.addEventListener("online", () => updateCalendar());
             document.addEventListener("visibilitychange", () => {
                 if (document.visibilityState === "visible") {
-                    // Faqat vaqt o'tgan bo'lsa yoki kesh bo'lmasa yangilaymiz
                     if (isRefreshDue()) updateCalendar();
                 }
             });
