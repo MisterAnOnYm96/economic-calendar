@@ -448,7 +448,8 @@
         const API_URL = "https://showmytrades.com/api/public/calendar/v1";
         const UPDATE_INTERVAL_MS = 6 * 60 * 60 * 1000;
         const LAST_UPDATE_KEY = "economic_calendar_last_update";
-        const DATA_CACHE_KEY = "economic_calendar_data_cache"; // localStorage da saqlanadi
+        const DATA_CACHE_KEY = "economic_calendar_data_cache";
+        const FILTER_CACHE_KEY = "economic_calendar_filter_cache"; // Filtrlarni saqlash uchun
         const TIME_ZONE = "Asia/Tashkent";
 
         const CURRENCIES = [
@@ -459,23 +460,49 @@
             { code: "CNY", flag: "cn" }
         ];
 
+        // Standart holatlar
+        let savedImpacts = ["high"];
+        let savedCurrencies = ["USD"];
+
+        // Filtrlarni xotiradan o'qish
+        try {
+            const savedFilters = localStorage.getItem(FILTER_CACHE_KEY);
+            if (savedFilters) {
+                const parsed = JSON.parse(savedFilters);
+                if (parsed.impacts) savedImpacts = parsed.impacts;
+                if (parsed.currencies) savedCurrencies = parsed.currencies;
+            }
+        } catch (e) {
+            console.warn("Filtr keshini o'qishda xatolik", e);
+        }
+
         const state = {
             events: [], lastUpdated: null, loading: false,
             activeRange: "today",
-            impacts: new Set(["high"]), 
-            currencies: new Set(["USD"]), 
+            impacts: new Set(savedImpacts), 
+            currencies: new Set(savedCurrencies), 
             refreshTimer: null,
             statusInterval: null
         };
 
         const elements = {};
 
+        function saveFilterState() {
+            try {
+                localStorage.setItem(FILTER_CACHE_KEY, JSON.stringify({
+                    impacts: Array.from(state.impacts),
+                    currencies: Array.from(state.currencies)
+                }));
+            } catch (e) {
+                console.warn("Filtr keshini saqlashda xatolik", e);
+            }
+        }
+
         function getLastUpdate() {
             const value = Number(localStorage.getItem(LAST_UPDATE_KEY) || 0);
             return Number.isFinite(value) ? value : 0;
         }
 
-        // sessionStorage o'rniga localStorage ishlatildi
         function loadCachedData() {
             try {
                 const cached = localStorage.getItem(DATA_CACHE_KEY);
@@ -625,7 +652,14 @@
                     else state.currencies.add(code);
                     renderCurrencyList();
                     renderEvents();
+                    saveFilterState(); // Filtr o'zgarganda saqlash
                 });
+            });
+        }
+
+        function renderImpactCheckboxes() {
+            document.querySelectorAll("[data-impact]").forEach(input => {
+                input.checked = state.impacts.has(input.value);
             });
         }
 
@@ -848,6 +882,7 @@
                     if (input.checked) state.impacts.add(input.value);
                     else state.impacts.delete(input.value);
                     renderEvents();
+                    saveFilterState(); // Daraja o'zgarganda saqlash
                 });
             });
 
@@ -874,9 +909,9 @@
             elements.statusTime = document.getElementById("ec-status-time");
 
             renderCurrencyList();
+            renderImpactCheckboxes(); // Checkboxlarni saqlangan holatga moslash
             bindControls();
 
-            // Keshdan yuklash (Endi localStorage dan yuklanadi, brauzer yopilsa ham qoladi)
             const hasCache = loadCachedData();
             const savedTimestamp = getLastUpdate();
             if (savedTimestamp) {
@@ -888,7 +923,6 @@
                 updateStatusUI();
             }
 
-            // API ga faqat kesh bo'sh bo'lsa yoki 6 soat o'tgan bo'lsa murojaat qilamiz
             if (!hasCache || isRefreshDue()) {
                 updateCalendar();
             } else {
